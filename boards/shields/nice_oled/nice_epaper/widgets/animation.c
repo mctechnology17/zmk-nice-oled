@@ -29,5 +29,5 @@ void draw_animation(lv_obj_t *canvas, struct zmk_widget_screen *widget) {
     lv_img_set_src(art, anim_imgs[random_index]);
 #endif
 
-    lv_obj_align(art, LV_ALIGN_TOP_LEFT, 36, 0);
+    lv_obj_align(art, LV_ALIGN_TOP_LEFT, 6, 0);
 }
