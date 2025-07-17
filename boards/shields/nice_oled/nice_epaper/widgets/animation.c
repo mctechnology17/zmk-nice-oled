@@ -7,7 +7,7 @@ LV_IMG_DECLARE(crystal_02);
 
 const lv_img_dsc_t *anim_imgs[] = {
     &crystal_01,
-    &crytstal_02,
+    &crystal_02,
 };
 
 void draw_animation(lv_obj_t *canvas, struct zmk_widget_screen *widget) {
