@@ -151,7 +151,7 @@ config NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ONLY_CAPSLOCK
     bool "Enable HID indicators luna only on CapsLock"
     default n
 
-config NICE_BEETLE_DITHER_BEEDLY
+config CONFIG_NICE_BEETLE_DITHER_BEEDLY
     bool "Enable dithering on Beedly animation"
     default n
 
