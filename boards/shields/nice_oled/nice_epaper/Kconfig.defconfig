@@ -53,6 +53,10 @@ config NICE_VIEW_WIDGET_STATUS
 config NICE_VIEW_WIDGET_INVERTED
     bool "Invert display colors"
 
+config NICE_BEETLE_DITHER_BEEDLY
+    bool "Enable dithering on Beedly animation"
+    default n
+
 if !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
 
 config NICE_VIEW_WIDGET_STATUS
@@ -61,7 +65,3 @@ config NICE_VIEW_WIDGET_STATUS
 endif # !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
 
 endif # SHIELD_NICE_OLED_GEM
-
-config NICE_BEETLE_DITHER_BEEDLY
-    bool "Enable dithering on Beedly animation"
-    default n
