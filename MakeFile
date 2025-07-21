@@ -1,0 +1,20 @@
+PYTHON := python
+SCRIPT := png_to_lvgl_c_indexed.py
+INPUT_DIR := images
+OUTPUT_DIR := output
+
+PNG_FILES := $(wildcard $(INPUT_DIR)/*.png)
+C_FILES := $(patsubst $(INPUT_DIR)/%.png, $(OUTPUT_DIR)/%.c, $(PNG_FILES))
+
+.PHONY: all c_array_from_images clean
+
+all: c_array_from_images
+
+c_array_from_images: $(C_FILES)
+
+$(OUTPUT_DIR)/%.c: $(INPUT_DIR)/%.png $(SCRIPT)
+	@mkdir -p $(OUTPUT_DIR)
+	$(PYTHON) $(SCRIPT) $< $@
+
+clean:
+	rm -rf $(OUTPUT_DIR)/*.c
