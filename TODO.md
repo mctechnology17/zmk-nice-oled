@@ -25,11 +25,13 @@ A living and ever expanding list of improvements and ideas to improve Beedly.
   - [ ] Basic mood states (happy, hungry, tired, annoyed)
   - [ ] Optional: store "stats" in persistent memory or host-only flash
 
+- [ ] Beedly to replace Luna animations on LHS peripheral. 
+
 ---
 
 ## 💡 Ideas (Backlog)
 
 - [ ] Include `beedly.conf` for customization (thresholds, modes, etc.) once core behaviour is fleshed out
 - [ ] Add more minigames and behaviours for Beedly
-
+- [ ] Beedly for president.
 ---
