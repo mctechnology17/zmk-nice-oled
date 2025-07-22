@@ -6,10 +6,10 @@ A living and ever expanding list of improvements and ideas to improve Beedly.
 
 ## ✅ Core Tasks
 
-- [ ] Add Python-based workflow to automatically convert `.png` images into LVGL-compatible `.c` arrays  
-  - [ ] Integrate `png_to_lvgl_c_indexed.py` with a `Makefile`
-  - [ ] Output to a `generated/` folder with `.gitignore` support
-  - [ ] Add requirements file for Python dependencies
+- [X] Add Python-based workflow to automatically convert `.png` images into LVGL-compatible `.c` arrays  
+  - [X] Integrate with a `Makefile`
+  - [X] Output to same folder with `.gitignore` support
+  - [X] Add requirements file for Python dependencies
 
 ---
 

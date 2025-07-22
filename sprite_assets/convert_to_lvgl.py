@@ -1,5 +1,8 @@
 from PIL import Image
 import os
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
 
 def convert_png_to_lvgl_c_array(png_path):
     img = Image.open(png_path).convert('P')
@@ -7,11 +10,11 @@ def convert_png_to_lvgl_c_array(png_path):
 
     palette = img.getpalette()
     if palette is None:
-        raise ValueError("Image has no palette. Convert to indexed mode with 2 colors first.")
+        raise ValueError(f"{png_path} has no palette. Convert to indexed mode with 2 colors first.")
 
     num_colors = len(palette) // 3
     if num_colors < 2:
-        raise ValueError("Palette has less than 2 colors, need exactly 2 for 1-bit indexed.")
+        raise ValueError(f"{png_path} palette has less than 2 colors. Need exactly 2 for 1-bit indexed.")
 
     transparency_index = img.info.get('transparency', None)
 
@@ -24,7 +27,6 @@ def convert_png_to_lvgl_c_array(png_path):
         lvgl_palette.extend([r, g, b, a])
 
     pixels = list(img.getdata())
-    row_bytes = (width + 7) // 8
     packed_pixels = []
 
     for row in range(height):
@@ -70,18 +72,25 @@ def convert_png_to_lvgl_c_array(png_path):
     output_lines.append("  .data = img_data,")
     output_lines.append("};")
 
-    # Get only the filename, no path, no extension
     base_name = os.path.splitext(os.path.basename(png_path))[0]
-    output_filename = f"{base_name}.c"
+    output_dir = os.path.dirname(png_path)
+    output_filename = os.path.join(output_dir, f"{base_name}.c")
 
     with open(output_filename, "w") as f:
         f.write("\n".join(output_lines))
 
-    print(f"LVGL C array written to {output_filename}")
+    print(f"OK - Converted {png_path} → {output_filename}")
+
+def convert_all_pngs_in_directory(directory="."):
+    for filename in os.listdir(directory):
+        if filename.lower().endswith(".png"):
+            png_path = os.path.join(directory, filename)
+            try:
+                convert_png_to_lvgl_c_array(png_path)
+            except Exception as e:
+                print(f"X Skipped {filename}: {e}")
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) < 2:
-        print("Usage: python3 convert_lvgl.py your_image.png")
-    else:
-        convert_png_to_lvgl_c_array(sys.argv[1])
+    target_dir = sys.argv[1] if len(sys.argv) > 1 else "."
+    convert_all_pngs_in_directory(target_dir)

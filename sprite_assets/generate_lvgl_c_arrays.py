@@ -25,10 +25,7 @@ def run_aseprite_export(dithered=False):
         "--save-as",
         os.path.join(export_folder, "frame_{frame}.png"),  # export frames individually
     ], capture_output=True, text=True)
-
-    print("Aseprite stdout:", result.stdout)
-    print("Aseprite stderr:", result.stderr)
-
+    
     result.check_returncode()
     print("Aseprite export complete.")
     return export_folder
@@ -119,7 +116,15 @@ def main():
     rotate_images_90_clockwise(export_folder)
 
     # Step 3: Generate LVGL C arrays
-    generate_lvgl_c_array(dithered=args.dithered)
+    print("Calling LVGL conversion script...")
+
+    script_path = os.path.join(os.path.dirname(__file__), "convert_to_lvgl.py")
+    result = subprocess.run(
+        ["python", script_path, export_folder],
+        capture_output=True,
+        text=True
+    )
+    result.check_returncode()
 
 
 if __name__ == "__main__":

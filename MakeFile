@@ -1,20 +1,15 @@
+.PHONY: beedly beedly_dithered beedly_all
+
 PYTHON := python
-SCRIPT := png_to_lvgl_c_indexed.py
-INPUT_DIR := images
-OUTPUT_DIR := output
+SCRIPT := ./sprite_assets/generate_lvgl_c_arrays.py
 
-PNG_FILES := $(wildcard $(INPUT_DIR)/*.png)
-C_FILES := $(patsubst $(INPUT_DIR)/%.png, $(OUTPUT_DIR)/%.c, $(PNG_FILES))
+beedly:
+	@echo "=== Generating non-dithered LVGL assets ==="
+	$(PYTHON) $(SCRIPT)
 
-.PHONY: all c_array_from_images clean
+beedly_dithered:
+	@echo "=== Generating dithered LVGL assets ==="
+	$(PYTHON) $(SCRIPT) --dithered
 
-all: c_array_from_images
-
-c_array_from_images: $(C_FILES)
-
-$(OUTPUT_DIR)/%.c: $(INPUT_DIR)/%.png $(SCRIPT)
-	@mkdir -p $(OUTPUT_DIR)
-	$(PYTHON) $(SCRIPT) $< $@
-
-clean:
-	rm -rf $(OUTPUT_DIR)/*.c
+beedly_all: beedly beedly_dithered
+	@echo "=== All LVGL assets generated ==="
