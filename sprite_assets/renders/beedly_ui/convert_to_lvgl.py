@@ -1,24 +1,20 @@
 from PIL import Image
+import os
 
 def convert_png_to_lvgl_c_array(png_path):
     img = Image.open(png_path).convert('P')
     width, height = img.size
 
-    # Get palette (flat list [R,G,B,R,G,B,...])
     palette = img.getpalette()
     if palette is None:
         raise ValueError("Image has no palette. Convert to indexed mode with 2 colors first.")
 
-    # We only want first 2 colors (indexed 1-bit)
-    # Check image has at least 2 palette colors
     num_colors = len(palette) // 3
     if num_colors < 2:
         raise ValueError("Palette has less than 2 colors, need exactly 2 for 1-bit indexed.")
 
-    # Transparency index (if any)
     transparency_index = img.info.get('transparency', None)
 
-    # Build LVGL palette: 2 colors × 4 bytes (RGBA)
     lvgl_palette = []
     for i in range(2):
         r = palette[i * 3 + 0]
@@ -28,8 +24,6 @@ def convert_png_to_lvgl_c_array(png_path):
         lvgl_palette.extend([r, g, b, a])
 
     pixels = list(img.getdata())
-
-    # Pack pixels row by row, pad each row to full bytes
     row_bytes = (width + 7) // 8
     packed_pixels = []
 
@@ -45,41 +39,45 @@ def convert_png_to_lvgl_c_array(png_path):
                 packed_pixels.append(byte)
                 byte = 0
                 bits_filled = 0
-        # Pad leftover bits in this row
         if bits_filled > 0:
             byte = byte << (8 - bits_filled)
             packed_pixels.append(byte)
 
     total_size = len(lvgl_palette) + len(packed_pixels)
 
-    # Print C array output
-    print(f"/* Image size: {width} x {height} */")
-    print(f"/* Data size: {total_size} bytes (palette + pixel data) */")
-    print(f"static const uint8_t img_data[] = {{")
+    output_lines = []
+    output_lines.append(f"/* Image size: {width} x {height} */")
+    output_lines.append(f"/* Data size: {total_size} bytes (palette + pixel data) */")
+    output_lines.append(f"static const uint8_t img_data[] = {{")
 
-    # Palette bytes
     for i in range(0, len(lvgl_palette), 4):
-        print(f"  0x{lvgl_palette[i]:02X}, 0x{lvgl_palette[i+1]:02X}, 0x{lvgl_palette[i+2]:02X}, 0x{lvgl_palette[i+3]:02X},")
+        output_lines.append(f"  0x{lvgl_palette[i]:02X}, 0x{lvgl_palette[i+1]:02X}, 0x{lvgl_palette[i+2]:02X}, 0x{lvgl_palette[i+3]:02X},")
 
-    # Pixel data bytes (grouped 12 per line)
     for i in range(0, len(packed_pixels), 12):
         line = ", ".join(f"0x{b:02X}" for b in packed_pixels[i:i+12])
-        print(f"  {line},")
+        output_lines.append(f"  {line},")
 
-    print("};\n")
+    output_lines.append("};\n")
+    output_lines.append("lv_img_dsc_t my_img = {")
+    output_lines.append("  .header = {")
+    output_lines.append("    .cf = LV_IMG_CF_INDEXED_1BIT,")
+    output_lines.append("    .always_zero = 0,")
+    output_lines.append("    .reserved = 0,")
+    output_lines.append(f"    .w = {width},")
+    output_lines.append(f"    .h = {height},")
+    output_lines.append("  },")
+    output_lines.append(f"  .data_size = {total_size},")
+    output_lines.append("  .data = img_data,")
+    output_lines.append("};")
 
-    # Print lv_img_dsc_t struct
-    print("lv_img_dsc_t my_img = {")
-    print("  .header = {")
-    print("    .cf = LV_IMG_CF_INDEXED_1BIT,")
-    print("    .always_zero = 0,")
-    print("    .reserved = 0,")
-    print(f"    .w = {width},")
-    print(f"    .h = {height},")
-    print("  },")
-    print(f"  .data_size = {total_size},")
-    print("  .data = img_data,")
-    print("};")
+    # Get only the filename, no path, no extension
+    base_name = os.path.splitext(os.path.basename(png_path))[0]
+    output_filename = f"{base_name}.c"
+
+    with open(output_filename, "w") as f:
+        f.write("\n".join(output_lines))
+
+    print(f"LVGL C array written to {output_filename}")
 
 if __name__ == "__main__":
     import sys
