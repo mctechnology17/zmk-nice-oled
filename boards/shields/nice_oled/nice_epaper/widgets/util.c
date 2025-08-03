@@ -8,7 +8,7 @@ void to_uppercase(char *str) {
     }
 }
 
-void rotate_canvas(lv_obj_t *canvas, lv_color_t cbuf[]) {
+void //rotate_canvas(lv_obj_t *canvas, lv_color_t cbuf[]) {
     static lv_color_t cbuf_tmp[CANVAS_HEIGHT * CANVAS_HEIGHT];
     memcpy(cbuf_tmp, cbuf, sizeof(cbuf_tmp));
 
