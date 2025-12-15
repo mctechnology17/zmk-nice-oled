@@ -1,6 +1,6 @@
 file_format: "1"
-id: nice_oled
-name: nice!oled
+id: nice_epaper
+name: nice!epaper
 type: shield
 url: https://github.com/mctechnology17/zmk-nice-oled
 requires: [nice_view_header]
@@ -9,3 +9,4 @@ features:
 siblings:
   - nice_oled
   - nice_epaper
+  - nice_custom

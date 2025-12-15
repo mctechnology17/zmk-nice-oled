@@ -10,3 +10,4 @@ features:
 siblings:
   - nice_oled
   - nice_epaper
+  - nice_custom

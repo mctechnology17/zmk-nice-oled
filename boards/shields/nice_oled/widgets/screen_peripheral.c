@@ -21,6 +21,25 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
 /**
+ * sleep status
+ **/
+
+#if IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE) ||                                         \
+    IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP)
+#include "sleep_status.h"
+static struct zmk_widget_sleep_status sleep_status_widget;
+#endif
+
+/**
+ * luna
+ **/
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM)
+#include "luna.h"
+static struct zmk_widget_luna luna_widget;
+#endif
+
+/**
  * Draw canvas
  **/
 
@@ -50,6 +69,21 @@ static void set_battery_status(struct zmk_widget_screen *widget,
     widget->state.battery = state.level;
 
     draw_canvas(widget->obj, widget->cbuf, &widget->state);
+
+    // draw_animation(widget->obj, widget);
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY)
+    if (widget->state.charging) {
+        // mostrar
+        // lv_obj_clear_flag(widget->obj, LV_OBJ_FLAG_HIDDEN);
+        animation_smart_battery_on(widget->obj);
+
+    } else {
+        // quitar
+        // lv_obj_add_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
+        animation_smart_battery_off(widget->obj);
+    }
+#endif
 }
 
 static void battery_status_update_cb(struct battery_status_state state) {
@@ -113,9 +147,23 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
     lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_HEIGHT, CANVAS_HEIGHT, LV_IMG_CF_TRUE_COLOR);
 
     sys_slist_append(&widgets, &widget->node);
+
+#if !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY)
     draw_animation(canvas, widget);
+#endif
     widget_battery_status_init();
     widget_peripheral_status_init();
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM)
+    zmk_widget_luna_init(&luna_widget, canvas);
+    lv_obj_align(zmk_widget_luna_obj(&luna_widget), LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_Y);
+#endif
+
+#if IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE) ||                                         \
+    IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP)
+    zmk_widget_sleep_status_init(&sleep_status_widget, canvas);
+    lv_obj_align(zmk_widget_sleep_status_obj(&sleep_status_widget), LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_SLEEP_STATUS_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_SLEEP_STATUS_CUSTOM_Y);
+#endif
 
     return 0;
 }

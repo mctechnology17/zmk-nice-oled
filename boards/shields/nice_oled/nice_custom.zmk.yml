@@ -1,0 +1,12 @@
+file_format: "1"
+id: nice_custom
+name: nice!custom
+type: shield
+url: https://github.com/mctechnology17/zmk-nice-oled
+requires: [nice_view_header]
+features:
+  - display
+siblings:
+  - nice_oled
+  - nice_epaper
+  - nice_custom

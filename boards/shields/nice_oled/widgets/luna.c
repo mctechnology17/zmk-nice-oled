@@ -70,6 +70,7 @@ enum anim_state {
 } current_anim_state;
 
 static void set_animation(lv_obj_t *animing, struct luna_wpm_status_state state) {
+
     if (state.wpm < 15) { // def: 5
         if (current_anim_state != anim_state_idle) {
             lv_animimg_set_src(animing, SRC(idle_imgs));

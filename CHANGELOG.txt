@@ -1,39 +1,40 @@
 Changelog file for Structures extra.
 https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
 
-# FEATURES 0.0.1-beta1 (Mar 24, 2025)
+# FEATURES v0.0.2 (Dec 15, 2025)
 =======================================
 + NEW FEATURES
-- [x] COMMIT: feat: CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ONLY_CAPSLOCK, README updated
-- [x] CHANGELOG.txt updated
-- [x] README.md updated
-- [x] delete duplicate (in progress)
+- [x] COMMIT: feat: expanded shield support and modular widgets
+- [x] nice_epaper shield support added
+- [x] nice_custom shield abstraction layer added
+- [x] WPM widget added (Styles: Number, Speedometer, Graph)
+- [x] WPM animations added (Luna, Bongo Cat)
+- [x] HID Indicators widget added (CapsLock support)
+- [x] HID Indicators animations added (Luna, Bongo Cat)
+- [x] Modifiers Indicators widget added (Fixed styles, Luna animation)
+- [x] Layer widget added
+- [x] Profile widget added
+- [x] Responsive Bongo Cat widget added
+- [x] Raw HID widget added (Modular: Weather, Time, Layout, Volume)
+- [x] Media Player widget added (Spotify macOS integration via Raw HID)
+- [x] Peripheral animations added (Gem, Cat, Head, Pokemon, Spaceman)
+- [x] Peripheral static images added (Vim, Vip Marcos)
+- [x] Smart battery animation for peripheral added
+- [x] Configuration documentation updated (accurate defaults, choice variables)
+- [x] Partial support more OLED screen sizes (64x128, 128x64, 128x128), vista508, vista2070 and other ePaper / e-Ink hardware
+- [x] Dongle mode (Show periphery battery in Central)
+- [x] Added complete workflow for local compilation for the universal app wrapper for macos
+- [x] Added extended documentation for managing optimization and the nice custom shield NICE_CUSTOM_EXAMPLE.md and OPTIMIZE.md
+- [x] New section to publish packages and releases on GitHub following current standards
 
-# FEATURES 0.0.1-beta1 (Mar 24, 2025)
-=======================================
-+ NEW FEATURES
-- [x] COMMIT: feat: new shield nice_epaper, hid, modifiers, luna the dog
-- [x] delete duplicate (in progress)
-- [x] nice_view screen support
-- [x] modifiers support
-- [x] modifiers luna widget support
-- [x] hid support
-- [x] hid luna widget support
-- [x] load animation (in progress)
-- [x] README.md updated
++ FIXES
+- [x] COMMIT: fix: corrected default values for Luna and Modifiers widgets
+- [x] Default values for widgets positions corrected in documentation
+- [x] General Configuration reverted to 'choice' type for clarity
 
 + TODO
-- [ ] delete duplicate (in progress)
-- [ ] add a video tutorial to the repository
-- [ ] add new shield nice_color like Prospector (in progress)
-- [ ] OLED screens support 64x128, 128x64 and 128x128 (in progress)
-- [ ] dongle mode (Show periphery battery in Central) (in progress)
-- [ ] menu rgb (in progress)
-- [ ] screen protector (in progress)
-- [ ] compatibility orientation in different degrees 0, 90, 180, 270 (in progress)
-- [ ] more animations and fixed images for periphery (in progress)
-- [ ] Smart battery (in progress)
-- [ ] granular configuration to deactivate each widget (in progress)
-- [ ] load animation (in progress)
-- [ ] Responsive Bongocat per key (in progress)
-- [ ] Responsive Bongocat wpm (in progress)
+- [ ] Add a video tutorial to the repository
+- [ ] RGB menu
+- [ ] Orientation compatibility (0, 90, 180, 270 degrees)
+- [ ] More animations and fixed images for periphery
+- [ ] implement rssi for communication between host and central

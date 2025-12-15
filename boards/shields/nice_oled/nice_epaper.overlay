@@ -4,14 +4,17 @@
  * SPDX-License-Identifier: MIT
  */
 
+// don't work XD!
+// #include"boards/vikoto.dtsi"
+
 &nice_view_spi {
     status = "okay";
     nice_view: ls0xx@0 {
         compatible = "sharp,ls0xx";
         spi-max-frequency = <1000000>;
         reg = <0>;
-        width = <160>;
-        height = <68>;
+        width = <160>;  // epaper: 160 vista508: 144 vista2070: 400
+        height = <68>; // epaper: 68  vista508: 168 vista2070: 240
     };
 };
 

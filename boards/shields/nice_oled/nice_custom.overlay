@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) 2022 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+&nice_view_spi {
+    status = "okay";
+    nice_view: ls0xx@0 {
+        compatible = "sharp,ls0xx";
+        spi-max-frequency = <1000000>;
+        reg = <0>;
+        width = <400>;  // epaper: 160 vista508: 144 vista2070: 400
+        height = <240>; // epaper: 68  vista508: 168 vista2070: 240
+    };
+};
+
+/ {
+    chosen {
+        zephyr,display = &nice_view;
+    };
+};

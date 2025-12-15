@@ -1,0 +1,92 @@
+qmk-hid-host
+ZMK\ HID Runner.app
+zmk-hid-host
+ZMK_HID_Runner_Installer.dmg
+
+# zmk
+zmk/
+MY_README_zmk-nice-oled.md
+nice_oled_assets
+
+# sketchybar
+sketchybar/dotfiles/
+sketchybar/dotfiles
+sketchybar/dotfiles/*
+
+# MacOS
+vim-tools_notiz.vim
+.DS_Store
+./*/.DS_Store
+.vscode
+# .vimspector.json
+push.sh
+/test
+test/
+
+# c, cpp
+*.x
+*.d
+*.dSYM
+*.o
+*.out
+
+# log
+*.log
+
+# cache
+*.cache
+cache/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Tags
+#TAGS
+#!TAGS/
+#tags
+doc/tags
+tags-cn
+!tags/
+.tags
+.tags1
+tags.lock
+tags.temp
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+cscope.files
+cscope.out
+cscope.in.out
+cscope.po.out
+
+# Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+# Test % Tmp
+test.*
+tmp.*
+temp.*
+
+# Java
+*.class
+
+# JavaScript
+node_modules
+
+# Python
+*.pyc
+.idea/
+/.idea
+# build/
+__pycache__
+
+# Rust
+target/
+**/*.rs.bk

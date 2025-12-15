@@ -1,18 +1,34 @@
+if SHIELD_NICE_OLED || SHIELD_NICE_EPAPER || SHIELD_NICE_CUSTOM
+### GENERAL CONFIG START {{{
+config NICE_CUSTOM_ON
+    bool "Enable nice custom widget compatibility"
+    default n
+
+config NICE_OLED_ON
+    bool "Enable nice oled widget compatibility"
+    default y
+
 config NICE_EPAPER_ON
     bool "Enable nice view widget compatibility"
     default n
 
-if !NICE_EPAPER_ON
+config NICE_OLED_CUSTOM_CANVAS_WIDTH
+    int "Custom Canvas Width"
+    default 68
 
-if SHIELD_NICE_OLED
+config NICE_OLED_CUSTOM_CANVAS_HEIGHT
+    int "Custom Canvas Height"
+    default 160
 
 config LV_Z_VDB_SIZE
-    default 64 if SHIELD_NICE_OLED
-    # default 100 if !SHIELD_NICE_OLED
+    default 64 if NICE_OLED_ON
+    default 100 if NICE_EPAPER_ON
+    default 100 if NICE_CUSTOM_ON
 
 config LV_DPI_DEF
-    default 148 if SHIELD_NICE_OLED
-    # default 161 if !SHIELD_NICE_OLED
+    default 148 if NICE_OLED_ON
+    default 161 if NICE_EPAPER_ON
+    default 161 if NICE_CUSTOM_ON
 
 config LV_Z_BITS_PER_PIXEL
     default 1
@@ -30,97 +46,171 @@ choice ZMK_DISPLAY_STATUS_SCREEN
 endchoice
 
 config LV_Z_MEM_POOL_SIZE
-    default 4096 if ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+    default 8192 # dongle_display: 8192 prospector: 10000 def: 4096
+
+config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
+    int "zmk display dedicated thread stack size"
+    default 3072 if NICE_OLED_WIDGET_RAW_HID
+    default 2560
+
+config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
+    int "zmk display dedicated thread priority"
+    default 5
 
 config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
-    imply NICE_VIEW_WIDGET_STATUS
+    imply NICE_OLED_WIDGET_STATUS
 
-config NICE_OLED_GEM_ANIMATION_WPM_FIXED_RANGE
-    bool "Enable fixed range for WPM gauge/chart"
+config NICE_OLED_WIDGET_STATUS
+    bool "Custom nice oled status widget"
     default y
-
-config NICE_OLED_GEM_ANIMATION_WPM_FIXED_RANGE_MAX
-    int "Fixed range maximum for WPM gauge/chart"
-    default 100
-
-config NICE_OLED_GEM_ANIMATION
-    bool "Enable animation on peripheral"
-    default y
-
-config NICE_OLED_GEM_ANIMATION_SMART_BATTERY
-    bool "Enable animation on peripheral VERY EXPERIMENTAL!!"
-    default n
-
-config NICE_OLED_GEM_ANIMATION_MS
-    int "Animation length in milliseconds"
-    default 960
-
-config NICE_OLED_POKEMON_ANIMATION
-    bool "Enable animation on peripheral"
-    default n
-
-config NICE_OLED_POKEMON_ANIMATION_MS
-    int "Animation length in milliseconds"
-    default 4800
-
-config NICE_OLED_VIM
-    bool "Enable static vim on peripheral"
-    default n
-
-config NICE_OLED_VIP_MARCOS
-bool "Enable static vim_marcos on peripheral"
-    default n
-
-config NICE_OLED_WIDGET_MASTER_TEST
-    bool "Enable test widget on master"
-    default n
-
-config NICE_OLED_WIDGET_PERIPHERAL_TEST
-    bool "Enable test widget on peripheral"
-    default n
-
-config NICE_OLED_WIDGET_DONGLE_TEST
-    bool "Enable test widget on dongle"
-    default n
-
-config NICE_VIEW_WIDGET_STATUS
     select LV_USE_LABEL
     select LV_USE_IMG
     select LV_USE_CANVAS
     select LV_USE_ANIMIMG
     select LV_USE_ANIMATION
 
-config NICE_VIEW_WIDGET_INVERTED
+config NICE_OLED_WIDGET_INVERTED
     bool "Invert display colors"
 
-if !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+### GENERAL CONFIG END  }}}
+### WIDGET ON CENTRAL AND PERIPHERAL START {{{
+config NICE_OLED_WIDGET_OUTPUT_BACKGROUND
+    bool "Enable output background on central and peripheral"
+    default n if NICE_OLED_ON
+    default y if NICE_EPAPER_ON
+    default y if NICE_CUSTOM_ON
 
-config NICE_VIEW_WIDGET_STATUS
-    select ZMK_WPM
-
-### NICE OLED WIDGET LAYER RGB TODO:
-config NICE_OLED_WIDGET_LAYER_RGB
-    bool "Enable layer rgb widget"
+config NICE_OLED_SHOW_SLEEP_ART_ON_IDLE
+    bool "whether the sleep art should be shown on idle"
     default n
 
-endif # !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+config NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP
+    bool "whether the sleep art should be shown on idle"
+    default n
 
-endif # SHIELD_NICE_OLED
-endif # NICE_EPAPER_ON
+## ANIMATION ON CENTRAL AND PERIPHERAL END }}}
+### WIDGET ON PERIPHERAL START {{{
+### SMART_BATTERY {{{
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY
+    bool "Enable animation on peripheral"
+    default n
+##}}}
+### NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM {{{
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM
+    bool "Enable PERIPHERAL WPM widget compatibility"
+    default n
 
-if SHIELD_NICE_OLED || SHIELD_NICE_EPAPER
+if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM
+
+config NICE_OLED_WIDGET_STATUS
+    select ZMK_WPM
+
+endif
+##}}}
+### NICE_OLED_WIDGET_ANIMATION_PERIPHERAL || NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL {{{
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL
+    bool "Enable animation on peripheral"
+    default y
+
+config NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL
+    bool "Enable static image on peripheral"
+    default y if !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL
+
+if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL || NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL
+
+if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM
+    bool "Enable gem animation on peripheral"
+    default n
+
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT
+    bool "Enable cat animation on peripheral"
+    default y
+
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD
+    bool "Enable head animation on peripheral"
+    default n
+
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON
+    bool "Enable pokemon animation on peripheral"
+    default n
+
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN
+    bool "Enable spaceman animation on peripheral"
+    default n
+
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS
+    int "Animation length in milliseconds"
+    default 10000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON
+    default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD
+    default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN
+    default 960 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM
+    default 960 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT
+endif # NICE_OLED_WIDGET_ANIMATION_PERIPHERAL
+
+if NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL
+config NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL_VIM
+    bool "Enable static vim on peripheral"
+    default n
+
+config NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL_VIP_MARCOS
+bool "Enable static vim_marcos on peripheral"
+    default n
+endif # NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL
+
+endif # NICE_OLED_WIDGET_ANIMATION_PERIPHERAL || NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL
+
+# CONFIG_NICE_OLED_WIDGET_PERIPHERAL
+config NICE_OLED_WIDGET_PERIPHERAL
+    bool "Enable test widget on peripheral"
+    default n
+### ONLY FOR PERIPHERAL END }}}
+### ANIMATION ON PERIPHERAL END }}}
+### WIDGET ON CENTRAL START {{{
 if !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+### NICE OLED WIDGET WPM {{{
 
-### NICE OLED WIDGET WPM
 config NICE_OLED_WIDGET_WPM
     bool "Enable Nice OLED WPM Widget"
     default y
 
 if NICE_OLED_WIDGET_WPM
 
-config NICE_OLED_WIDGET_WPM_LUNA
-    bool "Enable wpm luna"
+config NICE_OLED_WIDGET_STATUS
+    select ZMK_WPM
+
+config NICE_OLED_WIDGET_WPM_NUMBER
+    bool "Enable NUMBER for WPM"
+    default n
+
+config NICE_OLED_WIDGET_WPM_SPEEDOMETER
+    bool "Enable SPEEDOMETER for WPM"
+    default n if NICE_OLED_ON
+    default n if NICE_EPAPER_ON
+    default n if NICE_CUSTOM_ON
+
+config NICE_OLED_WIDGET_WPM_GRAPH
+    bool "Enable GRAPH for WPM gauge/chart"
+    default n if NICE_OLED_ON
+    default n if NICE_EPAPER_ON
+    default n if NICE_CUSTOM_ON
+
+if NICE_OLED_WIDGET_WPM_GRAPH || NICE_OLED_WIDGET_WPM_SPEEDOMETER # {{{
+
+config NICE_OLED_WIDGET_WPM_GRAPH_FIXED_RANGE
+    bool "Enable fixed range for WPM gauge/chart"
     default y
+
+config NICE_OLED_WIDGET_WPM_GRAPH_FIXED_RANGE_MAX
+    int "Fixed range maximum for WPM gauge/chart"
+    default 100
+
+endif # NICE_OLED_WIDGET_WPM_GRAPH
+
+##}}}
+config NICE_OLED_WIDGET_WPM_LUNA # {{{
+    bool "Enable wpm luna"
+    default n
 
 if NICE_OLED_WIDGET_WPM_LUNA
 
@@ -128,11 +218,50 @@ config NICE_OLED_WIDGET_WPM_LUNA_ANIMATION_MS
     int "Luna Animation in ms for WPM Widget"
     default 300
 
-endif # NICE_OLED_WIDGET_WPM_LUNA
 
-endif # NICE_OLED_WIDGET_WPM
 
-### NICE OLED WIDGET HID INDICATORS
+endif # NICE_OLED_WIDGET_WPM_LUNA }}}
+config NICE_OLED_WIDGET_WPM_BONGO_CAT # {{{
+    bool "Enable wpm bongo cat"
+    default y
+
+if NICE_OLED_WIDGET_WPM_BONGO_CAT
+
+config NICE_OLED_WIDGET_WPM_BONGO_CAT_ANIMATION_MS
+    int "Bongo Cat Animation in ms for WPM Widget"
+    default 300
+
+endif # NICE_OLED_WIDGET_WPM_BONGO_CAT }}}
+endif # NICE_OLED_WIDGET_WPM }}}
+### NICE_OLED_WIDGET_RESPONSIVE {{{
+config NICE_OLED_WIDGET_RESPONSIVE
+    bool "Enable widget responsive"
+    default n
+
+if NICE_OLED_WIDGET_RESPONSIVE
+
+# Override defaults for responsive mode (needs more resources)
+# Stack: def=2560, responsive=4096
+# Priority: def=5, responsive=3 (higher priority for smoother animations)
+config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
+    default 4096
+
+config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
+    default 3
+
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT # {{{
+    bool "Enable widget responsive bongo cat"
+    default n
+
+if NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT
+
+# TODO:
+
+endif # NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT }}}
+endif
+
+##}}}
+### NICE OLED WIDGET HID INDICATORS {{{
 config NICE_OLED_WIDGET_HID_INDICATORS
     bool "Enable HID indicators"
     default y
@@ -145,13 +274,13 @@ config ZMK_HID_INDICATORS
 
 config NICE_OLED_WIDGET_HID_INDICATORS_LUNA
     bool "Enable HID indicators luna"
-    default y
+    default n
+
+if NICE_OLED_WIDGET_HID_INDICATORS_LUNA
 
 config NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ONLY_CAPSLOCK
     bool "Enable HID indicators luna only on CapsLock"
     default n
-
-if NICE_OLED_WIDGET_HID_INDICATORS_LUNA
 
 config NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ANIMATION_MS
     int "Luna Animation in ms for HID Indicators"
@@ -159,18 +288,169 @@ config NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ANIMATION_MS
 
 endif # NICE_OLED_WIDGET_HID_INDICATORS_LUNA
 
-endif # NICE_OLED_WIDGET_HID_INDICATORS
 
-### NICE OLED WIDGET MODIFIERS INDICATORS
+config NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT
+    bool "Enable HID indicators bongo cat"
+    default n
+
+if NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT
+
+config NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ONLY_CAPSLOCK
+    bool "Enable HID indicators bongo cat only on CapsLock"
+    default n
+
+config NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ANIMATION_MS
+    int "Luna Animation in ms for HID Indicators bongo cat"
+    default 300
+
+endif # NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT
+
+endif # NICE_OLED_WIDGET_HID_INDICATORS }}}
+### NICE OLED WIDGET RAW HID {{{
+# CONFIG_NICE_OLED_WIDGET_RAW_HID
+# CONFIG_RAW_HID
+config NICE_OLED_WIDGET_RAW_HID
+    bool "Enable RAW HID"
+
+if NICE_OLED_WIDGET_RAW_HID
+
+config NICE_OLED_WIDGET_RAW_HID_DRIVER
+    bool "Enable Raw HID"
+    select LV_FONT_MONTSERRAT_14
+    imply USB_DEVICE_HID
+    default y if NICE_OLED_WIDGET_RAW_HID
+    # select LV_FONT_MONTSERRAT_22 if NICE_OLED_WIDGET_RAW_HID_BIG_LETTER
+    # depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+
+config USB_HID_DEVICE_COUNT
+    default 2
+
+config NICE_OLED_WIDGET_RAW_HID_USAGE_PAGE
+    hex "Raw HID Usage Page"
+    default 0xFF60
+
+config NICE_OLED_WIDGET_RAW_HID_USAGE
+    hex "Raw HID Usage"
+    default 0x61
+
+config NICE_OLED_WIDGET_RAW_HID_REPORT_SIZE
+    int "Raw HID Report Size"
+    default 32
+
+config NICE_OLED_WIDGET_RAW_HID_DEVICE
+    string "Raw HID Device"
+    default HID_1
+
+config NICE_OLED_WIDGET_RAW_HID_LAYOUT
+    bool "Show layout"
+    default y
+
+config NICE_OLED_WIDGET_RAW_HID_TIME
+    bool "Show time"
+    default y
+
+config NICE_OLED_WIDGET_RAW_HID_VOLUME
+    bool "Show volume"
+    default y
+
+config NICE_OLED_WIDGET_RAW_HID_LAYOUT_LIST
+    string "Comma-separated layout list"
+    default "DE,US,LA,AB"
+    # default "German,English,Spanish,ABC"
+    # default "DE,US,LA,AB"
+    # default "EN"
+    # default "German,US,LatinAmerican,ABC"
+
+# CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER
+config NICE_OLED_WIDGET_RAW_HID_WEATHER
+    bool "nice!OLED Weather Widget"
+    default n
+    help
+    Enable the Weather widget, which displays temperature data received
+    via RAW HID from the host computer.
+
+# CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS
+config NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS
+    bool "nice!OLED Spotify MacOS Media Player Widget"
+    default n
+    help
+    Enable the Media Player widget, which displays song info received
+    via RAW HID from the host computer.
+
+
+endif # NICE_OLED_WIDGET_RAW_HID }}}
+### NICE OLED WIDGET MODIFIERS INDICATORS {{{
 config NICE_OLED_WIDGET_MODIFIERS_INDICATORS
     bool "Enable modifiers indicators"
     default y
 
 if NICE_OLED_WIDGET_MODIFIERS_INDICATORS
 
+config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED
+    bool "Enable modifiers indicators fixed"
+    default y
+
+
+if NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED
+
+choice NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_STYLE
+    prompt "Modifiers Style"
+    default NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_LETTER
+        bool "Letter (e.g. C S A G)"
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL
+        bool "Symbol (Icons)"
+endchoice
+
+choice NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_LAYOUT
+    prompt "Modifiers Layout"
+    default NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_BOX
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_HOR
+        bool "Horizontal (One Line)"
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER
+        bool "Vertical (Stacked)"
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_BOX
+        bool "Box (2x2 Grid)"
+endchoice
+
+if NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER
+
+choice NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN
+    prompt "Vertical Layout Alignment"
+    default NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_CENTER
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_LEFT
+        bool "Left"
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_CENTER
+        bool "Center"
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_RIGHT
+        bool "Right"
+endchoice
+
+endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER
+
+choice NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_OS
+    prompt "Symbol OS Style"
+    default NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_MACOS
+    depends on NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_MACOS
+        bool "macOS (Cmd/Opt symbols)"
+
+    config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_WINDOWS
+        bool "Windows (Win/Alt symbols)"
+endchoice
+
 config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA
     bool "Enable modifiers indicators luna"
-    default y
+    default n
 
 if NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA
 
@@ -179,10 +459,360 @@ config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS
     default 300
 
 endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA
-endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS
-endif # !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
-endif # SHIELD_NICE_OLED || SHIELD_NICE_EPAPER
 
-if NICE_EPAPER_ON
-rsource "nice_epaper/Kconfig.defconfig"
-endif # NICE_EPAPER_ON
+
+
+
+endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED
+endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS }}}
+### NICE OLED WIDGET LAYER {{{
+config NICE_OLED_WIDGET_LAYER
+    bool "Enable layer widget"
+    default y
+# }}}
+### NICE OLED WIDGET PROFILE {{{
+config NICE_OLED_WIDGET_PROFILE_BIG
+    bool "Enable show widget profile bigger"
+    default y if NICE_EPAPER_ON
+    default y if NICE_CUSTOM_ON
+    default n
+# }}}
+### NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL {{{
+config NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ALL
+    bool "View all available batteries on the central screen, including the central battery."
+    default n
+
+config NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ONLY
+    bool "View all peripheral batteries, but not the central battery"
+    default n
+
+config NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_AND_CENTRAL
+    bool "View only 1 peripheral batterie and the central battery"
+    default n
+
+##}}}
+### ONLY FOR CENTRAL START {{{
+config NICE_OLED_WIDGET_CENTRAL
+    bool "Enable test widget on central"
+    default n
+### ONLY FOR CENTRAL END }}}
+endif # !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+## ANIMATION ON CENTRAL END }}}
+### WIDGET POSITION COORDINATES START {{{
+# These variables allow users to customize widget positions.
+# Users can override the defaults by setting the value in their .conf file.
+
+## LAYER WIDGET POSITION {{{
+config NICE_OLED_WIDGET_LAYER_CUSTOM_X
+    int "Layer widget X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_LAYER_CUSTOM_Y
+    int "Layer widget Y position"
+    default 146 if NICE_OLED_ON
+    default 146 if NICE_EPAPER_ON
+    default 146
+##}}}
+
+## BATTERY WIDGET POSITION {{{
+config NICE_OLED_WIDGET_BATTERY_CUSTOM_X
+    int "Battery widget X position"
+    default 0 if NICE_OLED_ON
+    default 26 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_BATTERY_CUSTOM_Y
+    int "Battery widget Y position"
+    default 50 if NICE_OLED_ON
+    default 19 if NICE_EPAPER_ON
+    default 50
+##}}}
+
+## PROFILE WIDGET POSITION {{{
+config NICE_OLED_WIDGET_PROFILE_CUSTOM_X
+    int "Profile widget X position"
+    default 0 if NICE_OLED_ON
+    default 18 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_PROFILE_CUSTOM_Y
+    int "Profile widget Y position"
+    default 137 if NICE_OLED_ON
+    default 129 if NICE_EPAPER_ON
+    default 137
+
+config NICE_OLED_WIDGET_PROFILE_TEXT_CUSTOM_X
+    int "Profile text X position"
+    default 25 if NICE_OLED_ON
+    default 25 if NICE_EPAPER_ON
+    default 25
+
+config NICE_OLED_WIDGET_PROFILE_TEXT_CUSTOM_Y
+    int "Profile text Y position"
+    default 32 if NICE_OLED_ON
+    default 32 if NICE_EPAPER_ON
+    default 32
+##}}}
+
+## OUTPUT WIDGET POSITION {{{
+config NICE_OLED_WIDGET_OUTPUT_USB_CUSTOM_X
+    int "Output USB icon X position"
+    default 0 if NICE_OLED_ON
+    default 45 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_OUTPUT_USB_CUSTOM_Y
+    int "Output USB icon Y position"
+    default 34 if NICE_OLED_ON
+    default 2 if NICE_EPAPER_ON
+    default 34
+
+config NICE_OLED_WIDGET_OUTPUT_BT_CUSTOM_X
+    int "Output BT icon X position"
+    default 4 if NICE_OLED_ON
+    default 49 if NICE_EPAPER_ON
+    default 4
+
+config NICE_OLED_WIDGET_OUTPUT_BT_CUSTOM_Y
+    int "Output BT icon Y position"
+    default 32 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 32
+
+config NICE_OLED_WIDGET_OUTPUT_BT_UNBONDED_CUSTOM_X
+    int "Output BT unbonded icon X position"
+    default -1 if NICE_OLED_ON
+    default 44 if NICE_EPAPER_ON
+    default -1
+
+config NICE_OLED_WIDGET_OUTPUT_BT_UNBONDED_CUSTOM_Y
+    int "Output BT unbonded icon Y position"
+    default 32 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 32
+##}}}
+
+## WPM WIDGET POSITION {{{
+config NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_X
+    int "WPM gauge X position"
+    default 0 if NICE_OLED_ON
+    default 16 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_Y
+    int "WPM gauge Y position"
+    default 70 if NICE_OLED_ON
+    default 43 if NICE_EPAPER_ON
+    default 70
+
+config NICE_OLED_WIDGET_WPM_NEEDLE_CENTER_CUSTOM_X
+    int "WPM needle center X position"
+    default 12 if NICE_OLED_ON
+    default 33 if NICE_EPAPER_ON
+    default 12
+
+config NICE_OLED_WIDGET_WPM_NEEDLE_CENTER_CUSTOM_Y
+    int "WPM needle center Y position"
+    default 90 if NICE_OLED_ON
+    default 66 if NICE_EPAPER_ON
+    default 90
+
+config NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_X
+    int "WPM label X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_Y
+    int "WPM label Y position"
+    default 75 if NICE_OLED_ON
+    default 103 if NICE_EPAPER_ON
+    default 75
+##}}}
+
+## LUNA WIDGET POSITION {{{
+config NICE_OLED_WIDGET_LUNA_CUSTOM_X
+    int "Luna widget X position"
+    default 65 if NICE_OLED_ON # 36 for a other good position
+    default 100 if NICE_EPAPER_ON
+    default 100
+
+config NICE_OLED_WIDGET_LUNA_CUSTOM_Y
+    int "Luna widget Y position"
+    default 0 if NICE_OLED_ON
+    default 15 if NICE_EPAPER_ON
+    default 0
+##}}}
+
+## BONGO CAT WIDGET POSITION {{{
+# default 64 if NICE_OLED_ON
+
+config NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X
+    int "Bongo cat widget X position"
+    default 64 if NICE_OLED_ON # 33 for a other goot position
+    default 100 if NICE_EPAPER_ON
+    default 64
+
+config NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y
+    int "Bongo cat widget Y position"
+    default -9 if NICE_OLED_ON
+    default 8 if NICE_EPAPER_ON
+    default -9
+##}}}
+
+## HID INDICATORS WIDGET POSITION {{{
+config NICE_OLED_WIDGET_HID_INDICATORS_CUSTOM_X
+    int "HID indicators widget X position"
+    default 36 if NICE_OLED_ON
+    default 100 if NICE_EPAPER_ON
+    default 36
+
+config NICE_OLED_WIDGET_HID_INDICATORS_CUSTOM_Y
+    int "HID indicators widget Y position"
+    default 0 if NICE_OLED_ON
+    default 15 if NICE_EPAPER_ON && !NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT
+    default 8 if NICE_EPAPER_ON
+    default 0
+##}}}
+
+## MODIFIERS WIDGET POSITION {{{
+config NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X
+    int "Modifiers widget X position"
+    default 0 if NICE_OLED_ON
+    default 62 if NICE_EPAPER_ON
+    default 62
+
+config NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y
+    int "Modifiers widget Y position"
+    default 100 if NICE_OLED_ON
+    default 62 if NICE_EPAPER_ON
+    default 100
+##}}}
+
+## ANIMATION PERIPHERAL POSITION {{{
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CUSTOM_X
+    int "Animation peripheral X position"
+    default 18 if NICE_OLED_ON
+    default 36 if NICE_EPAPER_ON
+    default 18
+
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CUSTOM_Y
+    int "Animation peripheral Y position"
+    default -18 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default -18
+##}}}
+
+## RAW HID WIDGET POSITION {{{
+# Base position for RAW HID area (used as fallback)
+config NICE_OLED_WIDGET_RAW_HID_CUSTOM_X
+    int "Raw HID base X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_RAW_HID_CUSTOM_Y
+    int "Raw HID base Y position"
+    default 62 if NICE_OLED_ON
+    default 62 if NICE_EPAPER_ON
+    default 62
+
+# Weather (Temperature) submodule
+config NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_X
+    int "Raw HID Weather X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_Y
+    int "Raw HID Weather Y position"
+    default 62 if NICE_OLED_ON
+    default 62 if NICE_EPAPER_ON
+    default 62
+
+# Time submodule
+config NICE_OLED_WIDGET_RAW_HID_TIME_CUSTOM_X
+    int "Raw HID Time X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_RAW_HID_TIME_CUSTOM_Y
+    int "Raw HID Time Y position"
+    default 74 if NICE_OLED_ON
+    default 74 if NICE_EPAPER_ON
+    default 74
+
+# Layout submodule
+config NICE_OLED_WIDGET_RAW_HID_LAYOUT_CUSTOM_X
+    int "Raw HID Layout X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_RAW_HID_LAYOUT_CUSTOM_Y
+    int "Raw HID Layout Y position"
+    default 86 if NICE_OLED_ON
+    default 86 if NICE_EPAPER_ON
+    default 86
+
+# Volume submodule
+config NICE_OLED_WIDGET_RAW_HID_VOLUME_CUSTOM_X
+    int "Raw HID Volume X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_RAW_HID_VOLUME_CUSTOM_Y
+    int "Raw HID Volume Y position"
+    default 98 if NICE_OLED_ON
+    default 98 if NICE_EPAPER_ON
+    default 98
+
+# Media Player (Spotify) submodule
+config NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_X
+    int "Raw HID Media Player X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_Y
+    int "Raw HID Media Player Y position"
+    default 110 if NICE_OLED_ON
+    default 110 if NICE_EPAPER_ON
+    default 110
+##}}}
+
+## RESPONSIVE BONGO CAT WIDGET POSITION {{{
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CUSTOM_X
+    int "Responsive bongo cat widget X position"
+    default 64 if NICE_OLED_ON
+    default 64 if NICE_EPAPER_ON
+    default 64
+
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CUSTOM_Y
+    int "Responsive bongo cat widget Y position"
+    default -9 if NICE_OLED_ON
+    default -9 if NICE_EPAPER_ON
+    default -9
+##}}}
+
+## SLEEP STATUS WIDGET POSITION {{{
+config NICE_OLED_WIDGET_SLEEP_STATUS_CUSTOM_X
+    int "Sleep status widget X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_SLEEP_STATUS_CUSTOM_Y
+    int "Sleep status widget Y position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+##}}}
+
+### WIDGET POSITION COORDINATES END }}}
+endif # SHIELD_NICE_OLED || SHIELD_NICE_EPAPER || SHIELD_NICE_CUSTOM
+# vim: set fdm=marker:

@@ -1,0 +1,17 @@
+{
+  "devices": [
+    {
+      "name": "zmk",
+
+      "vendorId": "0x1D50",
+      "productId": "0x615E"
+
+
+    }
+  ],
+  "layouts": ["German", "US", "LatinAmerican", "ABC"],
+  "weather": {
+    "url": "wttr.in/Hamburg?format=%t"
+
+  }
+}

@@ -1,33 +1,26 @@
 #include "layer.h"
-#include "../assets/custom_fonts.h"
-#include <ctype.h> // Para toupper()
+#include <fonts.h>
 #include <zephyr/kernel.h>
 
-// MC: better implementation
 void draw_layer_status(lv_obj_t *canvas, const struct status_state *state) {
-  lv_draw_label_dsc_t label_dsc;
-  init_label_dsc(&label_dsc, LVGL_FOREGROUND, &pixel_operator_mono,
-                 LV_TEXT_ALIGN_LEFT);
+    lv_draw_label_dsc_t label_dsc;
+#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
+    init_label_dsc(&label_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_CENTER);
+#else
+    init_label_dsc(&label_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_LEFT);
+#endif // CONFIG_NICE_EPAPER_ON
 
-  char text[14] = {};
-  int result;
+    char text[10] = {};
 
-  if (state->layer_label == NULL) {
-    result = snprintf(text, sizeof(text), "Layer %i", state->layer_index);
-  } else {
-    result = snprintf(text, sizeof(text), "%s", state->layer_label);
-    for (int i = 0; text[i] != '\0'; i++) {
-      // toupper( ... ): This function, found in the ctype.h library, takes a
-      // character as an argument and converts it to its uppercase equivalent.
-      // If the character is already uppercase or not a letter, the function
-      // returns it unchanged.
-      text[i] = toupper(text[i]);
+    if (state->layer_label == NULL) {
+        sprintf(text, "Layer %i", state->layer_index);
+    } else {
+        strncpy(text, state->layer_label, 9);
+        to_uppercase(text);
     }
-  }
 
-  if (result >= sizeof(text)) {
-    LV_LOG_WARN("truncated");
-  }
-
-  lv_canvas_draw_text(canvas, 0, 146, 68, &label_dsc, text);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT)
+    lv_canvas_fill_bg(canvas, LVGL_BACKGROUND, LV_OPA_COVER);
+#endif
+    lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_LAYER_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_LAYER_CUSTOM_Y, 68, &label_dsc, text);
 }

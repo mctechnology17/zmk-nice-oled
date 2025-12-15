@@ -10,7 +10,7 @@
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_01 uint8_t
     crystal_01_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -77,7 +77,7 @@ const lv_img_dsc_t crystal_01 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_02 uint8_t
     crystal_02_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -144,7 +144,7 @@ const lv_img_dsc_t crystal_02 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_03 uint8_t
     crystal_03_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -211,7 +211,7 @@ const lv_img_dsc_t crystal_03 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_04 uint8_t
     crystal_04_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -278,7 +278,7 @@ const lv_img_dsc_t crystal_04 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_05 uint8_t
     crystal_05_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -345,7 +345,7 @@ const lv_img_dsc_t crystal_05 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_06 uint8_t
     crystal_06_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -412,7 +412,7 @@ const lv_img_dsc_t crystal_06 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_07 uint8_t
     crystal_07_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -479,7 +479,7 @@ const lv_img_dsc_t crystal_07 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_08 uint8_t
     crystal_08_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -546,7 +546,7 @@ const lv_img_dsc_t crystal_08 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_09 uint8_t
     crystal_09_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -613,7 +613,7 @@ const lv_img_dsc_t crystal_09 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_10 uint8_t
     crystal_10_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -680,7 +680,7 @@ const lv_img_dsc_t crystal_10 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_11 uint8_t
     crystal_11_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -747,7 +747,7 @@ const lv_img_dsc_t crystal_11 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_12 uint8_t
     crystal_12_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -814,7 +814,7 @@ const lv_img_dsc_t crystal_12 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_13 uint8_t
     crystal_13_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -881,7 +881,7 @@ const lv_img_dsc_t crystal_13 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_14 uint8_t
     crystal_14_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -948,7 +948,7 @@ const lv_img_dsc_t crystal_14 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_15 uint8_t
     crystal_15_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
@@ -1015,7 +1015,7 @@ const lv_img_dsc_t crystal_15 = {
 
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CRYSTAL_16 uint8_t
     crystal_16_map[] = {
-#if CONFIG_NICE_VIEW_WIDGET_INVERTED
+#if CONFIG_NICE_OLED_WIDGET_INVERTED
         0x00, 0x00, 0x00, 0xff, /*Color of index 0*/
         0xff, 0xff, 0xff, 0xff, /*Color of index 1*/
 #else
