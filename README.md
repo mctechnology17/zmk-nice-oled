@@ -94,6 +94,10 @@ The companion host application, `zmk-hid-host`, provides the necessary data brid
 </div>
 
 # Quick Installation
+> [!WARNING]
+>
+> TESTED USING ZMK v0.3.0 please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
+
 > [!TIP]
 >
 > All widgets are enabled `hid`,` modifiers`, `wpm` etc., if you want to
@@ -123,7 +127,7 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: main
+      revision: v0.3.0
       import: app/west.yml
     # support nice_oled and nice_epaper
     - name: zmk-nice-oled
