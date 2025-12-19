@@ -44,7 +44,7 @@ void animation_smart_battery_on(lv_obj_t *canvas) {
     lv_obj_center(art);
 
     lv_animimg_set_src(art, (const void **)crystal_imgs_test, 16);
-    lv_animimg_set_duration(art, CONFIG_NICE_OLED_GEM_ANIMATION_MS);
+    lv_animimg_set_duration(art, CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS);
     lv_animimg_set_repeat_count(art, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(art);
     lv_obj_align(art, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CUSTOM_Y);
