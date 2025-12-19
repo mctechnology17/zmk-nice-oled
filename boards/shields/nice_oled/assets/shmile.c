@@ -5,8 +5,8 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_shmile_0
-#define LV_ATTRIBUTE_IMG_shmile_0
+#ifndef LV_ATTRIBUTE_IMG_SHMILE_0
+#define LV_ATTRIBUTE_IMG_SHMILE_0
 #endif
 
 static const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMG_SHMILE_0 uint8_t shmile_0_map[] = {
