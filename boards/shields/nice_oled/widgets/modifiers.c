@@ -85,7 +85,31 @@ const lv_img_dsc_t *symbol_imgs_control[] = {&control_0, &control_white_0};
 const lv_img_dsc_t *symbol_imgs_shift[] = {&shift_0, &shift_white_0};
 
 #endif
-#else // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_VERTICAL)
+#define MODIFIERS_USE_SYMBOLS 1
+
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT)
+
+LV_IMG_DECLARE(bongo_cat_double_tap1_06);
+LV_IMG_DECLARE(bongo_cat_tap1_03);
+LV_IMG_DECLARE(bongo_cat_tap2_03);
+LV_IMG_DECLARE(bongo_cat_double_tap2_02);
+LV_IMG_DECLARE(bongo_cat_double_tap1_03);
+
+// Idle: sitting bongo cat
+const lv_img_dsc_t *bongo_imgs_idle[] = {&bongo_cat_double_tap1_06};
+// GUI/Cmd: tap left
+const lv_img_dsc_t *bongo_imgs_gui[] = {&bongo_cat_tap1_03, &bongo_cat_tap2_03};
+// Alt: tap right
+const lv_img_dsc_t *bongo_imgs_alt[] = {&bongo_cat_tap2_03, &bongo_cat_tap1_03};
+// Ctrl: fast double tap
+const lv_img_dsc_t *bongo_imgs_ctrl[] = {&bongo_cat_double_tap2_02, &bongo_cat_double_tap1_03};
+// Shift: alternating taps
+const lv_img_dsc_t *bongo_imgs_shift[] = {&bongo_cat_double_tap1_03, &bongo_cat_double_tap2_02};
+
+static lv_obj_t *bongo_imgs = NULL; // Variable estática para almacenar el objeto animado
+#define MODIFIERS_USE_BONGO_CAT 1
+
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA)
 
 LV_IMG_DECLARE(dog_sit1_90);
 LV_IMG_DECLARE(dog_sit2_90);
@@ -102,15 +126,20 @@ const lv_img_dsc_t *luna_imgs_run_90[] = {&dog_run1_90, &dog_run2_90};
 const lv_img_dsc_t *luna_imgs_sneak_90[] = {&dog_sneak1_90, &dog_sneak2_90};
 
 static lv_obj_t *luna_imgs = NULL; // Variable estática para almacenar el objeto animado
+#define MODIFIERS_USE_LUNA 1
 
-#endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_VERTICAL)
+#else
+// No animation, no symbols - modifiers widget will show nothing
+#define MODIFIERS_USE_NONE 1
+
+#endif
 
 static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) {
     uint8_t mods = zmk_hid_get_explicit_mods();
     /* Limpiamos el texto del label, ya que se usarán imágenes fijas */
     lv_label_set_text(label, "");
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_VERTICAL)
+#if defined(MODIFIERS_USE_SYMBOLS)
     //     lv_canvas_draw_img(canvas, 45, 2, &usb, &img_dsc);
 
     /* Definición de variables estáticas para cada imagen fija */
@@ -164,7 +193,60 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
     lv_img_set_src(fixed_shf,
                    (mods & (MOD_LSFT | MOD_RSFT)) ? symbol_imgs_shift[1] : symbol_imgs_shift[0]);
 
-#else // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_VERTICAL)
+#elif defined(MODIFIERS_USE_BONGO_CAT)
+    /* En modo "bongo cat" se utiliza la lógica de animación */
+    if (mods & (MOD_LGUI | MOD_RGUI)) {
+        if (!bongo_imgs) {
+            bongo_imgs = lv_animimg_create(label);
+            lv_obj_center(bongo_imgs);
+            lv_animimg_set_src(bongo_imgs, (const void **)bongo_imgs_gui, 2);
+            lv_animimg_set_duration(bongo_imgs,
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS);
+            lv_animimg_set_repeat_count(bongo_imgs, LV_ANIM_REPEAT_INFINITE);
+            lv_animimg_start(bongo_imgs);
+            lv_obj_align(bongo_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y);
+        }
+    } else if (mods & (MOD_LALT | MOD_RALT)) {
+        if (!bongo_imgs) {
+            bongo_imgs = lv_animimg_create(label);
+            lv_obj_center(bongo_imgs);
+            lv_animimg_set_src(bongo_imgs, (const void **)bongo_imgs_alt, 2);
+            lv_animimg_set_duration(bongo_imgs,
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS);
+            lv_animimg_set_repeat_count(bongo_imgs, LV_ANIM_REPEAT_INFINITE);
+            lv_animimg_start(bongo_imgs);
+            lv_obj_align(bongo_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y);
+        }
+    } else if (mods & (MOD_LCTL | MOD_RCTL)) {
+        if (!bongo_imgs) {
+            bongo_imgs = lv_animimg_create(label);
+            lv_obj_center(bongo_imgs);
+            lv_animimg_set_src(bongo_imgs, (const void **)bongo_imgs_ctrl, 2);
+            lv_animimg_set_duration(bongo_imgs,
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS);
+            lv_animimg_set_repeat_count(bongo_imgs, LV_ANIM_REPEAT_INFINITE);
+            lv_animimg_start(bongo_imgs);
+            lv_obj_align(bongo_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y);
+        }
+    } else if (mods & (MOD_LSFT | MOD_RSFT)) {
+        if (!bongo_imgs) {
+            bongo_imgs = lv_animimg_create(label);
+            lv_obj_center(bongo_imgs);
+            lv_animimg_set_src(bongo_imgs, (const void **)bongo_imgs_shift, 2);
+            lv_animimg_set_duration(bongo_imgs,
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS);
+            lv_animimg_set_repeat_count(bongo_imgs, LV_ANIM_REPEAT_INFINITE);
+            lv_animimg_start(bongo_imgs);
+            lv_obj_align(bongo_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y);
+        }
+    } else {
+        if (bongo_imgs) {
+            lv_obj_del(bongo_imgs);
+            bongo_imgs = NULL;
+        }
+    }
+
+#elif defined(MODIFIERS_USE_LUNA)
     /* En modo "luna" se utiliza la lógica de animación ya existente */
     if (mods & (MOD_LGUI | MOD_RGUI)) {
         if (!luna_imgs) {
@@ -216,7 +298,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             luna_imgs = NULL;
         }
     }
-#endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_VERTICAL)
+
+#else
+    // MODIFIERS_USE_NONE: No animation, no symbols
+    // Widget remains functional but displays nothing visually
+    (void)mods; // Suppress unused variable warning
+#endif
 }
 
 /**

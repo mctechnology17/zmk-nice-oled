@@ -1,6 +1,38 @@
 Changelog file for Structures extra.
 https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
 
+# FEATURES v0.0.3 (Jan 09, 2026)
+=======================================
+# NEW FEATURES
+- [x] **Bongo Cat for Modifiers Indicators** CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT added
+- [x] **New macro** MODIFIERS_USE_BONGO_CAT for conditional compilation
+- [x] **New Variable** CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE Now the user decides whether to activate this function for @nice_custom and @nice_epaper
+- [x] **Battery performance and Better resource management for the peripheral side** CONFIG_LV_Z_MEM_POOL_SIZE=4096 CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=2560
+- [x] **Sponsor Links** added github, paypal, buymeacoffee and revolut
+- [x] **CODE_OF_CONDUCT.md** added
+
+# FIXES
+- [x] COMMIT: fix: HID Indicators and Modifiers animation can now be fully disabled, feat: Bongo Cat for Modifiers
+- [x] **HID Indicators animation fix** Luna animation no longer appears as fallback when user disables both Luna and BongoCat
+- [x] **Modifiers Indicators animation fix** Luna animation now respects CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA flag
+- [x] **New macros** HID_HAS_ANIMATION, MODIFIERS_USE_SYMBOLS, MODIFIERS_USE_LUNA, MODIFIERS_USE_BONGO_CAT, MODIFIERS_USE_NONE for conditional compilation
+- [x] **Changed default** CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT from y to n (no animation by default)
+- [x] **replaced a reference** to CONFIG_NICE_OLED_GEM_ANIMATION_MS, which does not exist, with CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS, which i believe is the (now generic) replacement, thanks @newx-it
+
+# BREAKING CHANGES
+- [x] HID Indicators no longer shows any animation by default. Users who want Luna or BongoCat must explicitly enable them in their .conf file
+- [x] Modifiers Indicators now requires explicit CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA=y or CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT=y to show animation
+
++ TODO
+- [ ] Add a video tutorial to the repository
+- [ ] RGB menu
+- [ ] Orientation compatibility (0, 90, 180, 270 degrees)
+- [ ] More animations and fixed images for periphery
+- [ ] implement rssi for communication between host and central
+- [ ] OS detection with image or animation
+- [ ] update to 4.1
+- [ ] wpm on peripheral
+
 # FEATURES v0.0.2 (Dec 15, 2025)
 =======================================
 # NEW FEATURES

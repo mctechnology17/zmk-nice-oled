@@ -45,12 +45,20 @@ choice ZMK_DISPLAY_STATUS_SCREEN
     default ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
 endchoice
 
+# CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE
+# !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+config ZMK_DISPLAY_BLANK_ON_IDLE
+    default n if NICE_OLED_ON
+    default y if NICE_EPAPER_ON
+    default y if NICE_CUSTOM_ON
+
 config LV_Z_MEM_POOL_SIZE
-    default 8192 # dongle_display: 8192 prospector: 10000 def: 4096
+    default 8192 if !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL # dongle_display: 8192 prospector: 10000 def: 4096
+    default 4096 # dongle_display: 8192 prospector: 10000 def: 4096
 
 config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
     int "zmk display dedicated thread stack size"
-    default 3072 if NICE_OLED_WIDGET_RAW_HID
+    default 3072 if NICE_OLED_WIDGET_RAW_HID && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
     default 2560
 
 config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
@@ -280,7 +288,7 @@ if NICE_OLED_WIDGET_HID_INDICATORS_LUNA
 
 config NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ONLY_CAPSLOCK
     bool "Enable HID indicators luna only on CapsLock"
-    default n
+    default y
 
 config NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ANIMATION_MS
     int "Luna Animation in ms for HID Indicators"
@@ -297,7 +305,7 @@ if NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT
 
 config NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ONLY_CAPSLOCK
     bool "Enable HID indicators bongo cat only on CapsLock"
-    default n
+    default y
 
 config NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ANIMATION_MS
     int "Luna Animation in ms for HID Indicators bongo cat"
@@ -448,6 +456,8 @@ choice NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_OS
         bool "Windows (Win/Alt symbols)"
 endchoice
 
+endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED
+
 config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA
     bool "Enable modifiers indicators luna"
     default n
@@ -460,10 +470,17 @@ config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS
 
 endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA
 
+config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT
+    bool "Enable modifiers indicators bongo cat"
+    default n
 
+if NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT
 
+config NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS
+    int "Bongo Cat Animation in ms for Modifiers Indicators"
+    default 300
 
-endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED
+endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT
 endif # NICE_OLED_WIDGET_MODIFIERS_INDICATORS }}}
 ### NICE OLED WIDGET LAYER {{{
 config NICE_OLED_WIDGET_LAYER
