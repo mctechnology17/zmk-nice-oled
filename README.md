@@ -189,6 +189,7 @@ This document lists the available configuration options for the `nice_oled` shie
 | `CONFIG_LV_COLOR_DEPTH` | choice | `LV_COLOR_DEPTH_1` | Color depth |
 | `CONFIG_ZMK_DISPLAY_WORK_QUEUE` | choice | `ZMK_DISPLAY_WORK_QUEUE_DEDICATED` | Work queue type |
 | `CONFIG_ZMK_DISPLAY_STATUS_SCREEN` | choice | `ZMK_DISPLAY_STATUS_SCREEN_CUSTOM` | Status screen type |
+| `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE` | bool | `n` (OLED), `y` (ePaper) | Control display blanking on idle for nice_custom/nice_epaper |
 | `CONFIG_LV_Z_MEM_POOL_SIZE` | int | `8192` | Memory pool size |
 | `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE` | int | `2560` (`3072` with RAW HID) | Display thread stack size |
 | `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY` | int | `5` | Display thread priority (lower = higher priority) |
@@ -242,16 +243,16 @@ This document lists the available configuration options for the `nice_oled` shie
 
 ## HID Indicators
 
-| Variable | Type | Default | Description |
-|----------|------|---------|-------------|
-| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS` | bool | `y` | Enable HID indicators |
-| `CONFIG_ZMK_HID_INDICATORS` | bool | `y` | Enable HID indicators (Core ZMK) |
-| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA` | bool | `n` | Enable HID indicators luna |
-| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ONLY_CAPSLOCK`| bool | `n` | Enable HID indicators luna only on CapsLock |
-| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ANIMATION_MS` | int | `300` | Luna Animation in ms for HID Indicators |
-| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT` | bool | `n` | Enable HID indicators bongo cat |
-| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ONLY_CAPSLOCK` | bool | `n` | Enable HID indicators bongo cat only on CapsLock |
-| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ANIMATION_MS` | int | `300` | Luna Animation in ms for HID Indicators bongo cat |
+| Variable                                                         | Type | Default | Description                                       |
+|------------------------------------------------------------------|------|---------|---------------------------------------------------|
+| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS`                         | bool | `y`     | Enable HID indicators                             |
+| `CONFIG_ZMK_HID_INDICATORS`                                      | bool | `y`     | Enable HID indicators (Core ZMK)                  |
+| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA`                    | bool | `n`     | Enable HID indicators luna                        |
+| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ONLY_CAPSLOCK`      | bool | `y`     | Enable HID indicators luna only on CapsLock       |
+| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ANIMATION_MS`       | int  | `300`   | Luna Animation in ms for HID Indicators           |
+| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT`               | bool | `n`     | Enable HID indicators bongo cat                   |
+| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ONLY_CAPSLOCK` | bool | `y`     | Enable HID indicators bongo cat only on CapsLock  |
+| `CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ANIMATION_MS`  | int  | `300`   | Luna Animation in ms for HID Indicators bongo cat |
 
 ## Raw HID
 
@@ -289,6 +290,8 @@ This document lists the available configuration options for the `nice_oled` shie
 | `CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_WINDOWS` | bool | `n` | OS Style: Windows |
 | `CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA` | bool | `n` | Enable modifiers indicators luna |
 | `CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS` | int | `300` | Luna Animation in ms for Modifiers Indicators |
+| `CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT` | bool | `n` | Enable Bongo Cat animation for Modifiers Indicators |
+| `CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS` | int | `300` | Animation speed (ms) for Modifiers Bongo Cat |
 
 ### Symbol Icons
 
