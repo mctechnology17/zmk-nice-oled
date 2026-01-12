@@ -299,3 +299,14 @@ const lv_img_dsc_t vim_68x69 = {
   .data_size = 620,
   .data = vim_68x69_map,
 };
+
+// Default vim image descriptor for static image peripheral
+const lv_img_dsc_t vim = {
+  .header.cf = LV_IMG_CF_INDEXED_1BIT,
+  .header.always_zero = 0,
+  .header.reserved = 0,
+  .header.w = 160,
+  .header.h = 68,
+  .data_size = 1368,
+  .data = vim_68x160_map,
+};
