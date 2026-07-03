@@ -172,6 +172,15 @@ endif # NICE_OLED_WIDGET_ANIMATION_PERIPHERAL || NICE_OLED_WIDGET_STATIC_IMAGE_P
 config NICE_OLED_WIDGET_PERIPHERAL
     bool "Enable test widget on peripheral"
     default n
+
+config NICE_OLED_EXTERNAL_WIDGET
+    bool "Let an external module add a widget to the peripheral screen"
+    default n
+    help
+      Calls nice_oled_external_widget_init(parent) during peripheral
+      screen init. The function must be provided by another Zephyr
+      module (e.g. zmk-peripheral-animations); enabling this without
+      such a module fails at link time.
 ### ONLY FOR PERIPHERAL END }}}
 ### ANIMATION ON PERIPHERAL END }}}
 ### WIDGET ON CENTRAL START {{{

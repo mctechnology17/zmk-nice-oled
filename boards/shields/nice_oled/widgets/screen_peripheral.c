@@ -20,6 +20,11 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
+#if IS_ENABLED(CONFIG_NICE_OLED_EXTERNAL_WIDGET)
+// Provided by another module (e.g. zmk-peripheral-animations)
+extern int nice_oled_external_widget_init(lv_obj_t *parent);
+#endif
+
 /**
  * sleep status
  **/
@@ -148,7 +153,9 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 
     sys_slist_append(&widgets, &widget->node);
 
-#if !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY)
+#if !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY) &&                     \
+    (IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL) ||                                   \
+     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL))
     draw_animation(canvas, widget);
 #endif
     widget_battery_status_init();
@@ -163,6 +170,10 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
     IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP)
     zmk_widget_sleep_status_init(&sleep_status_widget, canvas);
     lv_obj_align(zmk_widget_sleep_status_obj(&sleep_status_widget), LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_SLEEP_STATUS_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_SLEEP_STATUS_CUSTOM_Y);
+#endif
+
+#if IS_ENABLED(CONFIG_NICE_OLED_EXTERNAL_WIDGET)
+    nice_oled_external_widget_init(widget->obj);
 #endif
 
     return 0;
