@@ -78,7 +78,9 @@ const lv_img_dsc_t *mid_imgs[] = {
     &bongo_cat_tap2_03,
 };
 
-#define ANIMATION_SPEED_FAST 200
+// The fast state dominates CPU usage while typing, so it is the one exposed
+// through Kconfig (see docs/OPTIMIZE.md).
+#define ANIMATION_SPEED_FAST CONFIG_NICE_OLED_WIDGET_WPM_BONGO_CAT_ANIMATION_MS
 const lv_img_dsc_t *fast_imgs[] = {
     &bongo_cat_double_tap2_02,
     &bongo_cat_double_tap1_03,

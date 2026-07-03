@@ -30,28 +30,34 @@ LV_IMG_DECLARE(dog_run2_90);
 LV_IMG_DECLARE(dog_sneak1_90);
 LV_IMG_DECLARE(dog_sneak2_90);
 
-// #define ANIMATION_SPEED_IDLE 10000
-#define ANIMATION_SPEED_IDLE 960
+// Base cycle time comes from Kconfig so CPU usage is tunable (see
+// docs/OPTIMIZE.md). Idle runs at 3x the base so the sitting dog stays calm.
+// The Kconfig symbol only exists on central; peripheral builds with
+// NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM fall back to the same default.
+#ifdef CONFIG_NICE_OLED_WIDGET_WPM_LUNA_ANIMATION_MS
+#define ANIMATION_SPEED_BASE CONFIG_NICE_OLED_WIDGET_WPM_LUNA_ANIMATION_MS
+#else
+#define ANIMATION_SPEED_BASE 300
+#endif
+#define ANIMATION_SPEED_IDLE (ANIMATION_SPEED_BASE * 3)
 const lv_img_dsc_t *idle_imgs[] = {
     &dog_sit1_90,
     &dog_sit2_90,
 };
 
-// #define ANIMATION_SPEED_SLOW 2000
-#define ANIMATION_SPEED_SLOW 200
+#define ANIMATION_SPEED_SLOW ANIMATION_SPEED_BASE
 const lv_img_dsc_t *slow_imgs[] = {
     &dog_walk1_90,
     &dog_walk2_90,
 };
 
-// #define ANIMATION_SPEED_MID 500
-#define ANIMATION_SPEED_MID 200
+#define ANIMATION_SPEED_MID ANIMATION_SPEED_BASE
 const lv_img_dsc_t *mid_imgs[] = {
     &dog_walk1_90,
     &dog_walk2_90,
 };
 
-#define ANIMATION_SPEED_FAST 200
+#define ANIMATION_SPEED_FAST ANIMATION_SPEED_BASE
 const lv_img_dsc_t *fast_imgs[] = {
     &dog_run1_90,
     &dog_run2_90,
