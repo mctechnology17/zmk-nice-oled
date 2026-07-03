@@ -199,6 +199,19 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
 #include "wpm.h"
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
 
+// The full-canvas WPM listener is only needed when a WPM visual is drawn on
+// the canvas (number/speedometer/graph). Luna and Bongo Cat are standalone
+// lv_animimg widgets fed directly by the WPM event, so with only those
+// enabled the per-tick canvas redraw + rotation would be pure overhead.
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM) &&                                                     \
+    (IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_NUMBER) ||                                             \
+     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_SPEEDOMETER) ||                                        \
+     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_GRAPH))
+#define NICE_OLED_WPM_ON_CANVAS 1
+#else
+#define NICE_OLED_WPM_ON_CANVAS 0
+#endif
+
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
 //  Declaración adelantada (Forward Declaration) para draw_canvas
@@ -872,9 +885,9 @@ static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status
     draw_battery_text(canvas, state);
 #endif
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
+#if NICE_OLED_WPM_ON_CANVAS
     draw_wpm_status(canvas, state);
-#endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
+#endif // NICE_OLED_WPM_ON_CANVAS
     draw_profile_status(canvas, state);
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_LAYER)
     draw_layer_status(canvas, state);
@@ -1081,7 +1094,7 @@ ZMK_SUBSCRIPTION(widget_output_status, zmk_ble_active_profile_changed);
  * WPM status
  **/
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
+#if NICE_OLED_WPM_ON_CANVAS
 static void set_wpm_status(struct zmk_widget_screen *widget, struct wpm_status_state state) {
     for (int i = 0; i < 9; i++) {
         widget->state.wpm[i] = widget->state.wpm[i + 1];
@@ -1103,7 +1116,7 @@ struct wpm_status_state wpm_status_get_state(const zmk_event_t *eh) {
 ZMK_DISPLAY_WIDGET_LISTENER(widget_wpm_status, struct wpm_status_state, wpm_status_update_cb,
                             wpm_status_get_state)
 ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
-#endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
+#endif // NICE_OLED_WPM_ON_CANVAS
 
 /**
  * Initialization
@@ -1125,9 +1138,9 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
     widget_layer_status_init();
 #endif
     widget_output_status_init();
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
+#if NICE_OLED_WPM_ON_CANVAS
     widget_wpm_status_init();
-#endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
+#endif // NICE_OLED_WPM_ON_CANVAS
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
 
