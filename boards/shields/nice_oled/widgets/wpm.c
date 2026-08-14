@@ -65,6 +65,7 @@ static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
     lv_obj_set_style_line_width(line, line_dsc.width, 0);
     lv_obj_set_pos(line, 0, 0);
 }
+#endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID) || !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_GRAPH)
 #else
