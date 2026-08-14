@@ -65,7 +65,7 @@ static lv_obj_t *battery_label;
 static lv_obj_t *bolt_img;
 
 void draw_battery_status(lv_obj_t *canvas, const struct status_state *state) {
-    lv_obj_t *parent = lv_obj_get_parent(canvas);
+    lv_obj_t *parent = canvas;
 
     char text[10] = {};
     sprintf(text, "%i%%", state->battery);

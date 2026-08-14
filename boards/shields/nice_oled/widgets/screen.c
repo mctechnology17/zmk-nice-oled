@@ -908,12 +908,8 @@ static struct zmk_widget_hid_indicators hid_indicators_widget;
  **/
 
 static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
-    lv_obj_t *canvas = lv_obj_get_child(widget, 0);
+    lv_obj_t *canvas = widget;
 
-    // Widgets create their objects once (on first redraw) and update state on
-    // subsequent redraws, so no objects are deleted/re-created here.
-
-    draw_background(canvas);
     draw_output_status(canvas, state);
 #if !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ALL) &&                    \
     !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ONLY) &&                   \
@@ -945,8 +941,6 @@ static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status
     draw_mods_status(canvas, state);
 #endif // <-- NUEVO
 
-    // Rotate for horizontal display
-    rotate_canvas(canvas, cbuf);
 }
 
 /**
@@ -1167,10 +1161,10 @@ ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
 int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
     lv_obj_set_size(widget->obj, CANVAS_WIDTH, CANVAS_HEIGHT);
+    lv_obj_set_style_bg_color(widget->obj, lv_color_black(), 0);
+    lv_obj_set_style_bg_opa(widget->obj, LV_OPA_COVER, 0);
 
-    lv_obj_t *canvas = lv_canvas_create(widget->obj);
-    lv_obj_align(canvas, LV_ALIGN_TOP_LEFT, 0, 0);
-    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_NATIVE);
+    lv_obj_t *canvas = widget->obj;
 
     sys_slist_append(&widgets, &widget->node);
 

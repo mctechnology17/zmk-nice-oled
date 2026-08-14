@@ -10,7 +10,7 @@ LV_IMG_DECLARE(usb);
 static lv_obj_t *output_img;
 
 void draw_output_status(lv_obj_t *canvas, const struct status_state *state) {
-    lv_obj_t *parent = lv_obj_get_parent(canvas);
+    lv_obj_t *parent = canvas;
 
     const lv_image_dsc_t *src;
     lv_coord_t x;
