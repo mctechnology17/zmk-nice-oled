@@ -293,265 +293,27 @@ static const lv_image_dsc_t *mod_imgs_active[4] = {&control_white_0, &shift_whit
 #endif
 #endif // CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL
 
-// Función de dibujo para los modificadores
+static lv_obj_t *mod_symbols[4];
+
 static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state) {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL)
-    // --- MODO SÍMBOLOS (Imágenes reales) ---
-    // Las imágenes son 14x14 píxeles
     const int img_size = 14;
     const int spacing = 2;
-
-    // Posición Base según tipo de pantalla y layout
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER)
-    // --- VERTICAL (Apilado) ---
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_RIGHT)
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    const int base_x = 68 - img_size - 2; // buena posicion para X vertical en right
-#else
-    const int base_x = 128 - img_size - 2;
-#endif
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_LEFT)
     const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
-#else
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    const int base_x = (68 - img_size) / 2; // 68
-#else
-    const int base_x = (128 - img_size) / 2;
-#endif
-#endif
-    const int base_y = 62; // start base y = 38, test 62 like raw hid
+    const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
 
     for (int i = 0; i < 4; i++) {
         bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
-        int current_x = base_x;
-        int current_y = base_y + i * (img_size + spacing);
         const lv_image_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, img); lv_obj_set_pos(_img, current_x, current_y); }
-    }
-
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_HOR)
-    // --- HORIZONTAL ---
-    const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
-    const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
-
-    for (int i = 0; i < 4; i++) {
-        bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
-        int current_x = base_x + i * (img_size + spacing);
-        int current_y = base_y;
-        const lv_image_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, img); lv_obj_set_pos(_img, current_x, current_y); }
-    }
-
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_BOX)
-    // --- BOX (2x2) ---
-    const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
-    const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
-
-    static const int offsets_box[4][2] = {
-        {0, 0},                              // C (0,0)
-        {img_size + spacing, 0},             // S (0,1)
-        {0, img_size + spacing},             // A (1,0)
-        {img_size + spacing, img_size + spacing} // G (1,1)
-    };
-
-    for (int i = 0; i < 4; i++) {
-        bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
-        int current_x = base_x + offsets_box[i][0];
-        int current_y = base_y + offsets_box[i][1];
-        const lv_image_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, img); lv_obj_set_pos(_img, current_x, current_y); }
-    }
-
-#else
-    // --- DEFAULT: BOX fallback ---
-    const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
-    const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
-
-    static const int offsets_default[4][2] = {
-        {0, 0},
-        {img_size + spacing, 0},
-        {0, img_size + spacing},
-        {img_size + spacing, img_size + spacing}
-    };
-
-    for (int i = 0; i < 4; i++) {
-        bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
-        int current_x = base_x + offsets_default[i][0];
-        int current_y = base_y + offsets_default[i][1];
-        const lv_image_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, img); lv_obj_set_pos(_img, current_x, current_y); }
-    }
-#endif
-
-#else
-    // --- MODO LETRAS (Texto) ---
-    const char *items[4] = {"C", "S", "A", "G"};
-
-    // Dimensiones de caja
-    const int box_width = 12;
-    const int box_height = 14;
-    const int inner_box_offset = 2;
-    const int text_offset_y = 4;
-    const int inner_box_width = box_width - (2 * inner_box_offset);
-    const int inner_box_height = box_height - (2 * inner_box_offset);
-
-    // Posición Base según tipo de pantalla y layout
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER)
-    // --- VERTICAL (Apilado) ---
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_RIGHT)
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    const int base_x = 68 - box_width - 2;
-#else
-    const int base_x = 128 - box_width - 2;
-#endif
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_LEFT)
-    const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
-#else
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    const int base_x = (68 - box_width) / 2;
-#else
-    const int base_x = (128 - box_width) / 2;
-#endif
-#endif
-    const int base_y = 38;
-
-    for (int i = 0; i < 4; i++) {
-        bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
-        int current_x = base_x;
-        int current_y = base_y + i * (box_height + 2);
-
-        { lv_obj_t *_r = lv_obj_create(lv_obj_get_parent(canvas));
-          lv_obj_set_style_bg_color(_r, LVGL_BACKGROUND, 0);
-          lv_obj_set_style_bg_opa(_r, LV_OPA_COVER, 0);
-          lv_obj_set_style_border_width(_r, 0, 0);
-          lv_obj_set_size(_r, box_width, box_height);
-          lv_obj_set_pos(_r, current_x, current_y); }
-        if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            { lv_obj_t *_r2 = lv_obj_create(lv_obj_get_parent(canvas));
-              lv_obj_set_style_bg_color(_r2, LVGL_FOREGROUND, 0);
-              lv_obj_set_style_bg_opa(_r2, LV_OPA_COVER, 0);
-              lv_obj_set_style_border_width(_r2, 0, 0);
-              lv_obj_set_size(_r2, inner_box_width, inner_box_height);
-              lv_obj_set_pos(_r2, current_x + inner_box_offset, current_y + inner_box_offset); }
+        if (mod_symbols[i] == NULL) {
+            mod_symbols[i] = lv_image_create(canvas);
         }
-        { lv_obj_t *_lbl = lv_label_create(lv_obj_get_parent(canvas));
-          lv_label_set_text(_lbl, items[i]);
-          lv_obj_set_style_text_color(_lbl, selected ? LVGL_BACKGROUND : LVGL_FOREGROUND, 0);
-          lv_obj_set_style_text_font(_lbl, &lv_font_unscii_8, 0);
-          lv_obj_set_style_text_align(_lbl, LV_TEXT_ALIGN_CENTER, 0);
-          lv_obj_set_width(_lbl, box_width);
-          lv_obj_set_pos(_lbl, current_x, current_y + text_offset_y); }
-    }
-
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_HOR)
-    // --- HORIZONTAL ---
-    const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
-    const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
-
-    for (int i = 0; i < 4; i++) {
-        bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
-        int current_x = base_x + i * (box_width + 2);
-        int current_y = base_y;
-
-        { lv_obj_t *_r = lv_obj_create(lv_obj_get_parent(canvas));
-          lv_obj_set_style_bg_color(_r, LVGL_BACKGROUND, 0);
-          lv_obj_set_style_bg_opa(_r, LV_OPA_COVER, 0);
-          lv_obj_set_style_border_width(_r, 0, 0);
-          lv_obj_set_size(_r, box_width, box_height);
-          lv_obj_set_pos(_r, current_x, current_y); }
-        if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            { lv_obj_t *_r2 = lv_obj_create(lv_obj_get_parent(canvas));
-              lv_obj_set_style_bg_color(_r2, LVGL_FOREGROUND, 0);
-              lv_obj_set_style_bg_opa(_r2, LV_OPA_COVER, 0);
-              lv_obj_set_style_border_width(_r2, 0, 0);
-              lv_obj_set_size(_r2, inner_box_width, inner_box_height);
-              lv_obj_set_pos(_r2, current_x + inner_box_offset, current_y + inner_box_offset); }
-        }
-        { lv_obj_t *_lbl = lv_label_create(lv_obj_get_parent(canvas));
-          lv_label_set_text(_lbl, items[i]);
-          lv_obj_set_style_text_color(_lbl, selected ? LVGL_BACKGROUND : LVGL_FOREGROUND, 0);
-          lv_obj_set_style_text_font(_lbl, &lv_font_unscii_8, 0);
-          lv_obj_set_style_text_align(_lbl, LV_TEXT_ALIGN_CENTER, 0);
-          lv_obj_set_width(_lbl, box_width);
-          lv_obj_set_pos(_lbl, current_x, current_y + text_offset_y); }
-    }
-
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_BOX)
-    // --- BOX (2x2) ---
-    const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
-    const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
-
-    static const int offsets_box[4][2] = {
-        {0, 0}, {box_width + 2, 0}, {0, box_height + 2}, {box_width + 2, box_height + 2}
-    };
-
-    for (int i = 0; i < 4; i++) {
-        bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
-        int current_x = base_x + offsets_box[i][0];
-        int current_y = base_y + offsets_box[i][1];
-
-        { lv_obj_t *_r = lv_obj_create(lv_obj_get_parent(canvas));
-          lv_obj_set_style_bg_color(_r, LVGL_BACKGROUND, 0);
-          lv_obj_set_style_bg_opa(_r, LV_OPA_COVER, 0);
-          lv_obj_set_style_border_width(_r, 0, 0);
-          lv_obj_set_size(_r, box_width, box_height);
-          lv_obj_set_pos(_r, current_x, current_y); }
-        if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            { lv_obj_t *_r2 = lv_obj_create(lv_obj_get_parent(canvas));
-              lv_obj_set_style_bg_color(_r2, LVGL_FOREGROUND, 0);
-              lv_obj_set_style_bg_opa(_r2, LV_OPA_COVER, 0);
-              lv_obj_set_style_border_width(_r2, 0, 0);
-              lv_obj_set_size(_r2, inner_box_width, inner_box_height);
-              lv_obj_set_pos(_r2, current_x + inner_box_offset, current_y + inner_box_offset); }
-        }
-        { lv_obj_t *_lbl = lv_label_create(lv_obj_get_parent(canvas));
-          lv_label_set_text(_lbl, items[i]);
-          lv_obj_set_style_text_color(_lbl, selected ? LVGL_BACKGROUND : LVGL_FOREGROUND, 0);
-          lv_obj_set_style_text_font(_lbl, &lv_font_unscii_8, 0);
-          lv_obj_set_style_text_align(_lbl, LV_TEXT_ALIGN_CENTER, 0);
-          lv_obj_set_width(_lbl, box_width);
-          lv_obj_set_pos(_lbl, current_x, current_y + text_offset_y); }
-    }
-
-#else
-    // --- DEFAULT: BOX fallback ---
-    const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
-    const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
-
-    static const int offsets_default[4][2] = {
-        {0, 0}, {box_width + 2, 0}, {0, box_height + 2}, {box_width + 2, box_height + 2}
-    };
-
-    for (int i = 0; i < 4; i++) {
-        bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
-        int current_x = base_x + offsets_default[i][0];
-        int current_y = base_y + offsets_default[i][1];
-
-        { lv_obj_t *_r = lv_obj_create(lv_obj_get_parent(canvas));
-          lv_obj_set_style_bg_color(_r, LVGL_BACKGROUND, 0);
-          lv_obj_set_style_bg_opa(_r, LV_OPA_COVER, 0);
-          lv_obj_set_style_border_width(_r, 0, 0);
-          lv_obj_set_size(_r, box_width, box_height);
-          lv_obj_set_pos(_r, current_x, current_y); }
-        if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            { lv_obj_t *_r2 = lv_obj_create(lv_obj_get_parent(canvas));
-              lv_obj_set_style_bg_color(_r2, LVGL_FOREGROUND, 0);
-              lv_obj_set_style_bg_opa(_r2, LV_OPA_COVER, 0);
-              lv_obj_set_style_border_width(_r2, 0, 0);
-              lv_obj_set_size(_r2, inner_box_width, inner_box_height);
-              lv_obj_set_pos(_r2, current_x + inner_box_offset, current_y + inner_box_offset); }
-        }
-        { lv_obj_t *_lbl = lv_label_create(lv_obj_get_parent(canvas));
-          lv_label_set_text(_lbl, items[i]);
-          lv_obj_set_style_text_color(_lbl, selected ? LVGL_BACKGROUND : LVGL_FOREGROUND, 0);
-          lv_obj_set_style_text_font(_lbl, &lv_font_unscii_8, 0);
-          lv_obj_set_style_text_align(_lbl, LV_TEXT_ALIGN_CENTER, 0);
-          lv_obj_set_width(_lbl, box_width);
-          lv_obj_set_pos(_lbl, current_x, current_y + text_offset_y); }
+        lv_image_set_src(mod_symbols[i], img);
+        lv_obj_set_pos(mod_symbols[i], base_x + i * (img_size + spacing), base_y);
     }
 #endif
-#endif // CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL
 }
+
 
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED)
 //  FIN SECCIÓN MODIFICADORES (NUEVA INTEGRACIÓN)
