@@ -910,13 +910,9 @@ static struct zmk_widget_hid_indicators hid_indicators_widget;
 static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
     lv_obj_t *canvas = lv_obj_get_child(widget, 0);
 
-    // Widgets re-create their objects on every redraw; delete the previous ones
-    // (all children except the canvas) so the LVGL memory pool is not exhausted.
-    while (lv_obj_get_child_cnt(widget) > 1) {
-        lv_obj_delete(lv_obj_get_child(widget, 1));
-    }
+    // Widgets create their objects once (on first redraw) and update state on
+    // subsequent redraws, so no objects are deleted/re-created here.
 
-    // Draw widgets
     draw_background(canvas);
     draw_output_status(canvas, state);
 #if !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ALL) &&                    \
@@ -1170,11 +1166,11 @@ ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
 
 int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
-    lv_obj_set_size(widget->obj, CANVAS_HEIGHT, CANVAS_WIDTH);
+    lv_obj_set_size(widget->obj, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     lv_obj_t *canvas = lv_canvas_create(widget->obj);
     lv_obj_align(canvas, LV_ALIGN_TOP_LEFT, 0, 0);
-    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_HEIGHT, CANVAS_HEIGHT, LV_COLOR_FORMAT_NATIVE);
+    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_NATIVE);
 
     sys_slist_append(&widgets, &widget->node);
 

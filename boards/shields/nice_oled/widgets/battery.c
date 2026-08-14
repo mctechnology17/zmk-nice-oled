@@ -49,6 +49,7 @@ void animation_smart_battery_on(lv_obj_t *canvas) {
     lv_animimg_start(art);
     lv_obj_align(art, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CUSTOM_Y);
 }
+
 void animation_smart_battery_off(lv_obj_t *canvas) {
     if (art) {
         lv_obj_del(art);
@@ -60,61 +61,30 @@ void animation_smart_battery_off(lv_obj_t *canvas) {
 }
 #endif
 
-static void draw_level(lv_obj_t *canvas, const struct status_state *state) {
-    lv_draw_label_dsc_t label_right_dsc;
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    init_label_dsc(&label_right_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_RIGHT);
-#else
-    init_label_dsc(&label_right_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_LEFT);
-#endif // CONFIG_NICE_EPAPER_ON
-
-    char text[10] = {};
-
-    sprintf(text, "%i%%", state->battery);
-    // x, y, width, dsc, text
-    { lv_obj_t * _lbl = lv_label_create(canvas);
-  lv_label_set_text(_lbl, text);
-  lv_obj_set_pos(_lbl, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y); }
-}
-
-static void draw_charging_level(lv_obj_t *canvas, const struct status_state *state) {
-    lv_draw_image_dsc_t img_dsc;
-    lv_draw_image_dsc_init(&img_dsc);
-    lv_draw_label_dsc_t label_right_dsc;
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    init_label_dsc(&label_right_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_RIGHT);
-#else
-    init_label_dsc(&label_right_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_LEFT);
-#endif // CONFIG_NICE_EPAPER_ON
-
-    char text[10] = {};
-
-    sprintf(text, "%i", state->battery);
-    { lv_obj_t * _lbl = lv_label_create(canvas);
-  lv_label_set_text(_lbl, text);
-  lv_obj_set_pos(_lbl, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y); }
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas));
-  lv_image_set_src(_img, &bolt);
-  lv_obj_set_pos(_img, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X + 36, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y + 2); }
-#else
-    { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas));
-  lv_image_set_src(_img, &bolt);
-  lv_obj_set_pos(_img, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X + 25, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y); }
-#endif // CONFIG_NICE_EPAPER_ON
-}
+static lv_obj_t *battery_label;
+static lv_obj_t *bolt_img;
 
 void draw_battery_status(lv_obj_t *canvas, const struct status_state *state) {
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    lv_draw_label_dsc_t label_left_dsc;
-    init_label_dsc(&label_left_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_LEFT);
-    { lv_obj_t * _lbl = lv_label_create(canvas);
-  lv_label_set_text(_lbl, "BAT");
-  lv_obj_set_pos(_lbl, 0, 19); }
-#endif // CONFIG_NICE_EPAPER_ON
+    lv_obj_t *parent = lv_obj_get_parent(canvas);
+
+    char text[10] = {};
+    sprintf(text, "%i%%", state->battery);
+
+    if (battery_label == NULL) {
+        battery_label = lv_label_create(parent);
+        lv_obj_set_style_text_font(battery_label, &pixel_operator_mono_8, 0);
+    }
+    lv_label_set_text(battery_label, text);
+    lv_obj_set_pos(battery_label, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y);
+
     if (state->charging) {
-        draw_charging_level(canvas, state);
-    } else {
-        draw_level(canvas, state);
+        if (bolt_img == NULL) {
+            bolt_img = lv_image_create(parent);
+            lv_image_set_src(bolt_img, &bolt);
+        }
+        lv_obj_clear_flag(bolt_img, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_pos(bolt_img, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X - 12, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y);
+    } else if (bolt_img != NULL) {
+        lv_obj_add_flag(bolt_img, LV_OBJ_FLAG_HIDDEN);
     }
 }
