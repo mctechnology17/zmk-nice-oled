@@ -309,7 +309,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
             mod_symbols[i] = lv_image_create(canvas);
         }
         lv_image_set_src(mod_symbols[i], img);
-        lv_obj_set_pos(mod_symbols[i], base_x + i * (img_size + spacing), base_y);
+        lv_obj_set_pos(mod_symbols[i], base_x, base_y + i * (img_size + spacing));
     }
 #endif
 }

@@ -10,6 +10,8 @@ static struct zmk_widget_screen screen_widget;
 #endif
 
 lv_obj_t *zmk_display_status_screen() {
+    lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_90);
+
     lv_obj_t *screen;
     screen = lv_obj_create(NULL);
 
