@@ -73,6 +73,7 @@ void draw_battery_status(lv_obj_t *canvas, const struct status_state *state) {
     if (battery_label == NULL) {
         battery_label = lv_label_create(parent);
         lv_obj_set_style_text_font(battery_label, &pixel_operator_mono_8, 0);
+        lv_obj_set_style_text_color(battery_label, lv_color_white(), 0);
     }
     lv_label_set_text(battery_label, text);
     lv_obj_set_pos(battery_label, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y);
