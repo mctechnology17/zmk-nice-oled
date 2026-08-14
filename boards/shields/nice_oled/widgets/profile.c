@@ -1,5 +1,6 @@
 #include <zephyr/kernel.h>
 #include "profile.h"
+#include "lv_canvas_compat.h"
 #if !IS_ENABLED(CONFIG_NICE_EPAPER_ON)
 // use custom_fonts.h only for the draw_active_profile_text function
 #include <fonts.h>

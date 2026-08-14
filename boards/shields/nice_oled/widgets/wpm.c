@@ -1,4 +1,5 @@
 #include "wpm.h"
+#include "lv_canvas_compat.h"
 // #include "../assets/custom_fonts.h"
 #include <math.h>
 #include <zephyr/kernel.h>
