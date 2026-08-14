@@ -27,7 +27,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include "output.h"
 #include "profile.h"
 #include "screen.h"
-#include "lv_canvas_compat.h"
 
 #ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID
 #include <lvgl.h>
@@ -298,9 +297,6 @@ static const lv_image_dsc_t *mod_imgs_active[4] = {&control_white_0, &shift_whit
 static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state) {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL)
     // --- MODO SÍMBOLOS (Imágenes reales) ---
-    lv_draw_image_dsc_t img_dsc;
-    lv_draw_image_dsc_init(&img_dsc);
-
     // Las imágenes son 14x14 píxeles
     const int img_size = 14;
     const int spacing = 2;
@@ -330,7 +326,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x;
         int current_y = base_y + i * (img_size + spacing);
         const lv_image_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_image(canvas, current_x, current_y, img, &img_dsc);
+        { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, img); lv_obj_set_pos(_img, current_x, current_y); }
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_HOR)
@@ -343,7 +339,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + i * (img_size + spacing);
         int current_y = base_y;
         const lv_image_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_image(canvas, current_x, current_y, img, &img_dsc);
+        { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, img); lv_obj_set_pos(_img, current_x, current_y); }
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_BOX)
@@ -363,7 +359,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + offsets_box[i][0];
         int current_y = base_y + offsets_box[i][1];
         const lv_image_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_image(canvas, current_x, current_y, img, &img_dsc);
+        { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, img); lv_obj_set_pos(_img, current_x, current_y); }
     }
 
 #else
@@ -383,23 +379,13 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + offsets_default[i][0];
         int current_y = base_y + offsets_default[i][1];
         const lv_image_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_image(canvas, current_x, current_y, img, &img_dsc);
+        { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, img); lv_obj_set_pos(_img, current_x, current_y); }
     }
 #endif
 
 #else
     // --- MODO LETRAS (Texto) ---
     const char *items[4] = {"C", "S", "A", "G"};
-
-    // Descriptores de dibujo
-    lv_draw_rect_dsc_t rect_black_dsc;
-    init_rect_dsc(&rect_black_dsc, LVGL_BACKGROUND);
-    lv_draw_rect_dsc_t rect_white_dsc;
-    init_rect_dsc(&rect_white_dsc, LVGL_FOREGROUND);
-    lv_draw_label_dsc_t mod_dsc;
-    init_label_dsc(&mod_dsc, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
-    lv_draw_label_dsc_t mod_dsc_black;
-    init_label_dsc(&mod_dsc_black, LVGL_BACKGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
 
     // Dimensiones de caja
     const int box_width = 12;
@@ -434,14 +420,27 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x;
         int current_y = base_y + i * (box_height + 2);
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        { lv_obj_t *_r = lv_obj_create(lv_obj_get_parent(canvas));
+          lv_obj_set_style_bg_color(_r, LVGL_BACKGROUND, 0);
+          lv_obj_set_style_bg_opa(_r, LV_OPA_COVER, 0);
+          lv_obj_set_style_border_width(_r, 0, 0);
+          lv_obj_set_size(_r, box_width, box_height);
+          lv_obj_set_pos(_r, current_x, current_y); }
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
-                                current_y + inner_box_offset, inner_box_width, inner_box_height,
-                                &rect_white_dsc);
+            { lv_obj_t *_r2 = lv_obj_create(lv_obj_get_parent(canvas));
+              lv_obj_set_style_bg_color(_r2, LVGL_FOREGROUND, 0);
+              lv_obj_set_style_bg_opa(_r2, LV_OPA_COVER, 0);
+              lv_obj_set_style_border_width(_r2, 0, 0);
+              lv_obj_set_size(_r2, inner_box_width, inner_box_height);
+              lv_obj_set_pos(_r2, current_x + inner_box_offset, current_y + inner_box_offset); }
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
-                            (selected ? &mod_dsc_black : &mod_dsc), items[i]);
+        { lv_obj_t *_lbl = lv_label_create(lv_obj_get_parent(canvas));
+          lv_label_set_text(_lbl, items[i]);
+          lv_obj_set_style_text_color(_lbl, selected ? LVGL_BACKGROUND : LVGL_FOREGROUND, 0);
+          lv_obj_set_style_text_font(_lbl, &lv_font_unscii_8, 0);
+          lv_obj_set_style_text_align(_lbl, LV_TEXT_ALIGN_CENTER, 0);
+          lv_obj_set_width(_lbl, box_width);
+          lv_obj_set_pos(_lbl, current_x, current_y + text_offset_y); }
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_HOR)
@@ -454,14 +453,27 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + i * (box_width + 2);
         int current_y = base_y;
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        { lv_obj_t *_r = lv_obj_create(lv_obj_get_parent(canvas));
+          lv_obj_set_style_bg_color(_r, LVGL_BACKGROUND, 0);
+          lv_obj_set_style_bg_opa(_r, LV_OPA_COVER, 0);
+          lv_obj_set_style_border_width(_r, 0, 0);
+          lv_obj_set_size(_r, box_width, box_height);
+          lv_obj_set_pos(_r, current_x, current_y); }
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
-                                current_y + inner_box_offset, inner_box_width, inner_box_height,
-                                &rect_white_dsc);
+            { lv_obj_t *_r2 = lv_obj_create(lv_obj_get_parent(canvas));
+              lv_obj_set_style_bg_color(_r2, LVGL_FOREGROUND, 0);
+              lv_obj_set_style_bg_opa(_r2, LV_OPA_COVER, 0);
+              lv_obj_set_style_border_width(_r2, 0, 0);
+              lv_obj_set_size(_r2, inner_box_width, inner_box_height);
+              lv_obj_set_pos(_r2, current_x + inner_box_offset, current_y + inner_box_offset); }
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
-                            (selected ? &mod_dsc_black : &mod_dsc), items[i]);
+        { lv_obj_t *_lbl = lv_label_create(lv_obj_get_parent(canvas));
+          lv_label_set_text(_lbl, items[i]);
+          lv_obj_set_style_text_color(_lbl, selected ? LVGL_BACKGROUND : LVGL_FOREGROUND, 0);
+          lv_obj_set_style_text_font(_lbl, &lv_font_unscii_8, 0);
+          lv_obj_set_style_text_align(_lbl, LV_TEXT_ALIGN_CENTER, 0);
+          lv_obj_set_width(_lbl, box_width);
+          lv_obj_set_pos(_lbl, current_x, current_y + text_offset_y); }
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_BOX)
@@ -478,14 +490,27 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + offsets_box[i][0];
         int current_y = base_y + offsets_box[i][1];
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        { lv_obj_t *_r = lv_obj_create(lv_obj_get_parent(canvas));
+          lv_obj_set_style_bg_color(_r, LVGL_BACKGROUND, 0);
+          lv_obj_set_style_bg_opa(_r, LV_OPA_COVER, 0);
+          lv_obj_set_style_border_width(_r, 0, 0);
+          lv_obj_set_size(_r, box_width, box_height);
+          lv_obj_set_pos(_r, current_x, current_y); }
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
-                                current_y + inner_box_offset, inner_box_width, inner_box_height,
-                                &rect_white_dsc);
+            { lv_obj_t *_r2 = lv_obj_create(lv_obj_get_parent(canvas));
+              lv_obj_set_style_bg_color(_r2, LVGL_FOREGROUND, 0);
+              lv_obj_set_style_bg_opa(_r2, LV_OPA_COVER, 0);
+              lv_obj_set_style_border_width(_r2, 0, 0);
+              lv_obj_set_size(_r2, inner_box_width, inner_box_height);
+              lv_obj_set_pos(_r2, current_x + inner_box_offset, current_y + inner_box_offset); }
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
-                            (selected ? &mod_dsc_black : &mod_dsc), items[i]);
+        { lv_obj_t *_lbl = lv_label_create(lv_obj_get_parent(canvas));
+          lv_label_set_text(_lbl, items[i]);
+          lv_obj_set_style_text_color(_lbl, selected ? LVGL_BACKGROUND : LVGL_FOREGROUND, 0);
+          lv_obj_set_style_text_font(_lbl, &lv_font_unscii_8, 0);
+          lv_obj_set_style_text_align(_lbl, LV_TEXT_ALIGN_CENTER, 0);
+          lv_obj_set_width(_lbl, box_width);
+          lv_obj_set_pos(_lbl, current_x, current_y + text_offset_y); }
     }
 
 #else
@@ -502,14 +527,27 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + offsets_default[i][0];
         int current_y = base_y + offsets_default[i][1];
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        { lv_obj_t *_r = lv_obj_create(lv_obj_get_parent(canvas));
+          lv_obj_set_style_bg_color(_r, LVGL_BACKGROUND, 0);
+          lv_obj_set_style_bg_opa(_r, LV_OPA_COVER, 0);
+          lv_obj_set_style_border_width(_r, 0, 0);
+          lv_obj_set_size(_r, box_width, box_height);
+          lv_obj_set_pos(_r, current_x, current_y); }
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
-                                current_y + inner_box_offset, inner_box_width, inner_box_height,
-                                &rect_white_dsc);
+            { lv_obj_t *_r2 = lv_obj_create(lv_obj_get_parent(canvas));
+              lv_obj_set_style_bg_color(_r2, LVGL_FOREGROUND, 0);
+              lv_obj_set_style_bg_opa(_r2, LV_OPA_COVER, 0);
+              lv_obj_set_style_border_width(_r2, 0, 0);
+              lv_obj_set_size(_r2, inner_box_width, inner_box_height);
+              lv_obj_set_pos(_r2, current_x + inner_box_offset, current_y + inner_box_offset); }
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
-                            (selected ? &mod_dsc_black : &mod_dsc), items[i]);
+        { lv_obj_t *_lbl = lv_label_create(lv_obj_get_parent(canvas));
+          lv_label_set_text(_lbl, items[i]);
+          lv_obj_set_style_text_color(_lbl, selected ? LVGL_BACKGROUND : LVGL_FOREGROUND, 0);
+          lv_obj_set_style_text_font(_lbl, &lv_font_unscii_8, 0);
+          lv_obj_set_style_text_align(_lbl, LV_TEXT_ALIGN_CENTER, 0);
+          lv_obj_set_width(_lbl, box_width);
+          lv_obj_set_pos(_lbl, current_x, current_y + text_offset_y); }
     }
 #endif
 #endif // CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL

@@ -1,5 +1,4 @@
 #include "wpm.h"
-#include "lv_canvas_compat.h"
 // #include "../assets/custom_fonts.h"
 #include <math.h>
 #include <zephyr/kernel.h>
@@ -18,7 +17,7 @@ static void draw_gauge(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
 
-    lv_canvas_draw_image(canvas, CONFIG_NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_Y, &gauge, &img_dsc);
+    { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, &gauge); lv_obj_set_pos(_img, CONFIG_NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_Y); }
 }
 
 static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
@@ -57,9 +56,15 @@ static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
     int needleEndY = centerY + (int)(radius * sin(angleRad));
 
     lv_point_t points[2] = {{needleStartX, needleStartY}, {needleEndX, needleEndY}};
-    lv_canvas_draw_line(canvas, points, 2, &line_dsc);
+    static lv_point_precise_t line_pts[2];
+    line_pts[0] = lv_point_to_precise(&points[0]);
+    line_pts[1] = lv_point_to_precise(&points[1]);
+    lv_obj_t *line = lv_line_create(lv_obj_get_parent(canvas));
+    lv_line_set_points(line, line_pts, 2);
+    lv_obj_set_style_line_color(line, line_dsc.color, 0);
+    lv_obj_set_style_line_width(line, line_dsc.width, 0);
+    lv_obj_set_pos(line, 0, 0);
 }
-#endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID) || !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_GRAPH)
 #else
@@ -67,7 +72,7 @@ static void draw_grid(lv_obj_t *canvas) {
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
 
-    lv_canvas_draw_image(canvas, 0, 65, &grid, &img_dsc);
+    { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, &grid); lv_obj_set_pos(_img, 0, 65); }
 }
 
 static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
@@ -114,7 +119,13 @@ static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
     }
 #endif
 
-    lv_canvas_draw_line(canvas, points, 10, &line_dsc);
+    static lv_point_precise_t graph_pts[10];
+    for (int _i = 0; _i < 10; _i++) graph_pts[_i] = lv_point_to_precise(&points[_i]);
+    lv_obj_t *line = lv_line_create(lv_obj_get_parent(canvas));
+    lv_line_set_points(line, graph_pts, 10);
+    lv_obj_set_style_line_color(line, line_dsc.color, 0);
+    lv_obj_set_style_line_width(line, line_dsc.width, 0);
+    lv_obj_set_pos(line, 0, 0);
 }
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID) ||
        // !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_GRAPH)
@@ -166,7 +177,7 @@ static void draw_gauge(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
 
-    lv_canvas_draw_image(canvas, CONFIG_NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_Y, &gauge, &img_dsc);
+    { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, &gauge); lv_obj_set_pos(_img, CONFIG_NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_WPM_GAUGE_CUSTOM_Y); }
 }
 
 static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
@@ -213,9 +224,14 @@ static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
     int needleEndY = centerY + (int)(radius * sin(angleRad));
 
     lv_point_t points[2] = {{needleStartX, needleStartY}, {needleEndX, needleEndY}};
-    // canvas, points, number of points, line_dsc
-    lv_canvas_draw_line(canvas, points, 2, &line_dsc);
-    // lv_canvas_draw_line(canvas, points, 2, &line_dsc);
+    static lv_point_precise_t line_pts[2];
+    line_pts[0] = lv_point_to_precise(&points[0]);
+    line_pts[1] = lv_point_to_precise(&points[1]);
+    lv_obj_t *line = lv_line_create(lv_obj_get_parent(canvas));
+    lv_line_set_points(line, line_pts, 2);
+    lv_obj_set_style_line_color(line, line_dsc.color, 0);
+    lv_obj_set_style_line_width(line, line_dsc.width, 0);
+    lv_obj_set_pos(line, 0, 0);
 }
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_SPEEDOMETER)
 
@@ -228,7 +244,7 @@ static void draw_grid(lv_obj_t *canvas) {
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
 
-    lv_canvas_draw_image(canvas, -1, 95, &grid, &img_dsc);
+    { lv_obj_t *_img = lv_image_create(lv_obj_get_parent(canvas)); lv_image_set_src(_img, &grid); lv_obj_set_pos(_img, -1, 95); }
 }
 
 static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
@@ -278,7 +294,13 @@ static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
     }
 #endif
 
-    lv_canvas_draw_line(canvas, points, 10, &line_dsc);
+    static lv_point_precise_t graph_pts[10];
+    for (int _i = 0; _i < 10; _i++) graph_pts[_i] = lv_point_to_precise(&points[_i]);
+    lv_obj_t *line = lv_line_create(lv_obj_get_parent(canvas));
+    lv_line_set_points(line, graph_pts, 10);
+    lv_obj_set_style_line_color(line, line_dsc.color, 0);
+    lv_obj_set_style_line_width(line, line_dsc.width, 0);
+    lv_obj_set_pos(line, 0, 0);
 }
 #endif
 

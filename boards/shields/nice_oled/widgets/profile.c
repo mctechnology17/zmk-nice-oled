@@ -1,6 +1,5 @@
 #include <zephyr/kernel.h>
 #include "profile.h"
-#include "lv_canvas_compat.h"
 #if !IS_ENABLED(CONFIG_NICE_EPAPER_ON)
 // use custom_fonts.h only for the draw_active_profile_text function
 #include <fonts.h>
@@ -19,19 +18,19 @@ LV_IMG_DECLARE(profile_active);
 
 #if !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_PROFILE_BIG)
 static void draw_inactive_profiles(lv_obj_t *canvas, const struct status_state *state) {
-    lv_draw_image_dsc_t img_dsc;
-    lv_draw_image_dsc_init(&img_dsc);
-
-    lv_canvas_draw_image(canvas, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_Y, &profiles, &img_dsc);
+    lv_obj_t *img = lv_image_create(lv_obj_get_parent(canvas));
+    lv_image_set_src(img, &profiles);
+    lv_obj_set_pos(img, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_Y);
 }
 
 static void draw_active_profile(lv_obj_t *canvas, const struct status_state *state) {
-    lv_draw_rect_dsc_t rect_white_dsc;
-    init_rect_dsc(&rect_white_dsc, LVGL_FOREGROUND);
-
     int offset = state->active_profile_index * 7;
-
-    lv_canvas_draw_rect(canvas, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_X + offset, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_Y, 3, 3, &rect_white_dsc);
+    lv_obj_t *rect = lv_obj_create(lv_obj_get_parent(canvas));
+    lv_obj_set_style_bg_color(rect, LVGL_FOREGROUND, 0);
+    lv_obj_set_style_bg_opa(rect, LV_OPA_COVER, 0);
+    lv_obj_set_style_border_width(rect, 0, 0);
+    lv_obj_set_size(rect, 3, 3);
+    lv_obj_set_pos(rect, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_X + offset, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_Y);
 }
 #endif // !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_PROFILE_BIG)
 
@@ -56,12 +55,10 @@ void draw_profile_status(lv_obj_t *canvas, const struct status_state *state) {
 #endif // CONFIG_NICE_EPAPER_ON
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_PROFILE_BIG) //  && IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    lv_draw_image_dsc_t img_dsc;
-    lv_draw_image_dsc_init(&img_dsc);
-
     for (int i = 0; i < 5; i++) {
-        lv_canvas_draw_image(canvas, OFFSET_X + (i * 14), OFFSET_Y,
-                           i == state->active_profile_index ? &profile_active : &profile, &img_dsc);
+        lv_obj_t *img = lv_image_create(lv_obj_get_parent(canvas));
+        lv_image_set_src(img, i == state->active_profile_index ? &profile_active : &profile);
+        lv_obj_set_pos(img, OFFSET_X + (i * 14), OFFSET_Y);
     }
 #else
     draw_inactive_profiles(canvas, state);
