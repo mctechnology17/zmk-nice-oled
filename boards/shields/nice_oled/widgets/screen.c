@@ -910,6 +910,12 @@ static struct zmk_widget_hid_indicators hid_indicators_widget;
 static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
     lv_obj_t *canvas = lv_obj_get_child(widget, 0);
 
+    // Widgets re-create their objects on every redraw; delete the previous ones
+    // (all children except the canvas) so the LVGL memory pool is not exhausted.
+    while (lv_obj_get_child_cnt(widget) > 1) {
+        lv_obj_delete(lv_obj_get_child(widget, 1));
+    }
+
     // Draw widgets
     draw_background(canvas);
     draw_output_status(canvas, state);
