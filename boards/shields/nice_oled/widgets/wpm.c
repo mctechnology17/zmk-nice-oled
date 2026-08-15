@@ -306,29 +306,30 @@ static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_NUMBER)
-static void draw_label(lv_obj_t *canvas, const struct status_state *state) {
+static lv_obj_t *wpm_label;
 
-    lv_draw_label_dsc_t label_dsc_wpm;
-    init_label_dsc(&label_dsc_wpm, LVGL_FOREGROUND, &pixel_operator_mono_12, LV_TEXT_ALIGN_LEFT);
+static void draw_label(lv_obj_t *canvas, const struct status_state *state) {
+    lv_obj_t *parent = canvas;
 
     char wpm_text[10] = {};
 
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
-    // if wpm < 10, else if wpm => 10 and wpm < 100, else wpm >= 100
+
+    if (wpm_label == NULL) {
+        wpm_label = lv_label_create(parent);
+        lv_obj_set_style_text_font(wpm_label, &pixel_operator_mono_12, 0);
+        lv_obj_set_style_text_color(wpm_label, lv_color_white(), 0);
+    }
+    lv_label_set_text(wpm_label, wpm_text);
     if (state->wpm[9] < 10) {
-        { lv_obj_t * _lbl = lv_label_create(canvas);
-  lv_label_set_text(_lbl, wpm_text);
-  lv_obj_set_pos(_lbl, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_X + 5, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_Y); }
-    } else if (state->wpm[9] >= 10 && state->wpm[9] < 100) {
-        { lv_obj_t * _lbl = lv_label_create(canvas);
-  lv_label_set_text(_lbl, wpm_text);
-  lv_obj_set_pos(_lbl, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_X + 2, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_Y); }
+        lv_obj_set_pos(wpm_label, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_X + 5, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_Y);
+    } else if (state->wpm[9] < 100) {
+        lv_obj_set_pos(wpm_label, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_X + 2, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_Y);
     } else {
-        { lv_obj_t * _lbl = lv_label_create(canvas);
-  lv_label_set_text(_lbl, wpm_text);
-  lv_obj_set_pos(_lbl, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_Y); }
+        lv_obj_set_pos(wpm_label, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_WPM_LABEL_CUSTOM_Y);
     }
 }
+
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_NUMBER)
 #endif // CONFIG_NICE_EPAPER_ON
 
