@@ -48,7 +48,8 @@ static void set_sleep_img(struct zmk_widget_sleep_status *widget,
         lv_img_set_src(widget->art, &sleep_oled);
         lv_obj_clear_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
         // Crea un temporizador para ocultarla y restaurar la original después de 3s
-        lv_timer_create(hide_and_restore_cb, 3000, widget->art);
+        lv_timer_t *timer = lv_timer_create(hide_and_restore_cb, 3000, widget->art);
+        lv_timer_set_repeat_count(timer, 1);
         break;
         // TODO: END bootloader
     case ZMK_ACTIVITY_IDLE:

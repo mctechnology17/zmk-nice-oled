@@ -43,7 +43,7 @@ static struct zmk_widget_luna luna_widget;
  * Draw canvas
  **/
 
-static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
+static void draw_canvas(lv_obj_t *widget, const struct status_state *state) {
     lv_obj_t *canvas = lv_obj_get_child(widget, 0);
 
     // Draw widgets
@@ -52,7 +52,7 @@ static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status
     draw_battery_status(canvas, state);
 
     // Rotate for horizontal display
-    rotate_canvas(canvas, cbuf);
+    rotate_canvas(canvas);
 }
 
 /**
@@ -68,7 +68,7 @@ static void set_battery_status(struct zmk_widget_screen *widget,
 
     widget->state.battery = state.level;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    draw_canvas(widget->obj, &widget->state);
 
     // draw_animation(widget->obj, widget);
 
@@ -122,7 +122,7 @@ static void set_connection_status(struct zmk_widget_screen *widget,
                                   struct peripheral_status_state state) {
     widget->state.connected = state.connected;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    draw_canvas(widget->obj, &widget->state);
 }
 
 static void output_status_update_cb(struct peripheral_status_state state) {
@@ -144,7 +144,7 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 
     lv_obj_t *canvas = lv_canvas_create(widget->obj);
     lv_obj_align(canvas, LV_ALIGN_TOP_LEFT, 0, 0);
-    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_HEIGHT, CANVAS_HEIGHT, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_HEIGHT, CANVAS_HEIGHT, LV_COLOR_FORMAT_L8);
 
     sys_slist_append(&widgets, &widget->node);
 

@@ -80,7 +80,7 @@ static void start_idle_animation(lv_obj_t *obj) {
     lv_anim_init(&idle_anim);
     lv_anim_set_var(&idle_anim, obj);
     lv_anim_set_values(&idle_anim, 0, IDLE_FRAMES - 1);
-    lv_anim_set_time(&idle_anim, IDLE_ANIM_TIME);
+    lv_anim_set_duration(&idle_anim, IDLE_ANIM_TIME);
     lv_anim_set_exec_cb(&idle_anim, set_idle_frame);
     lv_anim_set_repeat_count(&idle_anim, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&idle_anim);

@@ -140,7 +140,7 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
     lv_label_set_text(label, "");
 
 #if defined(MODIFIERS_USE_SYMBOLS)
-    //     lv_canvas_draw_img(canvas, 45, 2, &usb, &img_dsc);
+    //     canvas_draw_img(canvas, 45, 2, &usb, &img_dsc);
 
     /* Definición de variables estáticas para cada imagen fija */
     static lv_obj_t *fixed_win = NULL;

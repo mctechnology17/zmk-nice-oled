@@ -20,7 +20,7 @@
 
 # Overview
 > [!WARNING]
-> TESTED USING ZMK v0.3.0 please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
+> TESTED USING ZMK main (Zephyr 4.1 + LVGL 9) please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
 
 Vertical widgets for [oled] and [niceview] screens using zmk (for split and non-split keyboards)
 
@@ -96,7 +96,7 @@ The companion host application, `zmk-hid-host`, provides the necessary data brid
 # Quick Installation
 > [!WARNING]
 >
-> TESTED USING ZMK v0.3.0 please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
+> TESTED USING ZMK main (Zephyr 4.1 + LVGL 9) please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
 
 > [!TIP]
 >
@@ -127,7 +127,7 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: v0.3.0
+      revision: main
       import: app/west.yml
     # support nice_oled and nice_epaper
     - name: zmk-nice-oled
@@ -205,6 +205,7 @@ This document lists the available configuration options for the `nice_oled` shie
 |----------|------|---------|-------------|
 | `CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE` | bool | `n` | Whether the sleep art should be shown on idle |
 | `CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP` | bool | `n` | Whether the sleep art should be shown on sleep |
+| `CONFIG_NICE_OLED_SLEEP_STATUS_BOOTLOADER` | bool | `n` | Show bootloader image briefly on wake (sleep status variant, replaces the default sleep art widget) |
 
 ## Peripheral Specific
 
