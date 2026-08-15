@@ -301,6 +301,10 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
     const int spacing = 2;
     const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
     const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
+    static const int offsets[4][2] = {
+        {0, 0}, {img_size + spacing, 0},
+        {0, img_size + spacing}, {img_size + spacing, img_size + spacing}
+    };
 
     for (int i = 0; i < 4; i++) {
         bool selected = (state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1;
@@ -309,7 +313,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
             mod_symbols[i] = lv_image_create(canvas);
         }
         lv_image_set_src(mod_symbols[i], img);
-        lv_obj_set_pos(mod_symbols[i], base_x, base_y + i * (img_size + spacing));
+        lv_obj_set_pos(mod_symbols[i], base_x + offsets[i][0], base_y + offsets[i][1]);
     }
 #endif
 }
