@@ -11,8 +11,8 @@ void to_uppercase(char *str) {
 void rotate_canvas(lv_obj_t *canvas, lv_color_t cbuf[]) {
   static lv_color_t nbuf[CANVAS_HEIGHT * CANVAS_HEIGHT];
   for (int y = 0; y < CANVAS_HEIGHT; ++y) {
-      for (int x = 0; x < CANVAS_HEIGHT; ++x) {
-          nbuf[y * CANVAS_HEIGHT + x] = cbuf[(CANVAS_HEIGHT - x) * CANVAS_HEIGHT + y];
+      for (int x = 0; x < CANVAS_HEIGHT - 1; ++x) {
+          nbuf[y * CANVAS_HEIGHT + x] = cbuf[(CANVAS_HEIGHT - x - 1) * CANVAS_HEIGHT + y];
       }
   }
 
