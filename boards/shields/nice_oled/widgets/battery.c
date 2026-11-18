@@ -201,7 +201,7 @@ void animation_smart_battery_on(lv_obj_t *canvas) {
     }
 
     lv_obj_add_flag(art2, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(art, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(art, LV_OBJ_FLAG_HIDDEN);
 
     if (!smart_battery_anim_running) {
         lv_animimg_start(art);
@@ -218,12 +218,12 @@ void animation_smart_battery_off(lv_obj_t *canvas) {
     }
 
     if (smart_battery_anim_running) {
-        lv_anim_del(art, NULL);
+        lv_anim_delete(art, NULL);
         smart_battery_anim_running = false;
     }
 
     lv_obj_add_flag(art, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(art2, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(art2, LV_OBJ_FLAG_HIDDEN);
 }
 #endif
 
@@ -239,12 +239,12 @@ static void draw_level(lv_obj_t *canvas, const struct status_state *state) {
 
     sprintf(text, "%i%%", state->battery);
     // x, y, width, dsc, text
-    lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y, 42, &label_right_dsc, text);
+    canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y, 42, &label_right_dsc, text);
 }
 
 static void draw_charging_level(lv_obj_t *canvas, const struct status_state *state) {
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
     lv_draw_label_dsc_t label_right_dsc;
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
     init_label_dsc(&label_right_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_RIGHT);
@@ -255,11 +255,11 @@ static void draw_charging_level(lv_obj_t *canvas, const struct status_state *sta
     char text[10] = {};
 
     sprintf(text, "%i", state->battery);
-    lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y, 35, &label_right_dsc, text);
+    canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y, 35, &label_right_dsc, text);
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    lv_canvas_draw_img(canvas, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X + 36, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y + 2, &bolt, &img_dsc);
+    canvas_draw_img(canvas, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X + 36, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y + 2, &bolt, &img_dsc);
 #else
-    lv_canvas_draw_img(canvas, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X + 25, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y, &bolt, &img_dsc);
+    canvas_draw_img(canvas, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_X + 25, CONFIG_NICE_OLED_WIDGET_BATTERY_CUSTOM_Y, &bolt, &img_dsc);
 #endif // CONFIG_NICE_EPAPER_ON
 }
 
@@ -267,7 +267,7 @@ static void draw_charging_level(lv_obj_t *canvas, const struct status_state *sta
     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL)
 static void draw_central_battery_peripheral(lv_obj_t *canvas, const struct status_state *state,
                                             lv_draw_label_dsc_t *label_dsc,
-                                            lv_draw_img_dsc_t *img_dsc) {
+                                            lv_draw_image_dsc_t *img_dsc) {
     char level_text[8] = {};
 
     if (state->central_battery_level == ZMK_PERIPHERAL_STATUS_SYNC_BATTERY_UNKNOWN) {
@@ -276,13 +276,13 @@ static void draw_central_battery_peripheral(lv_obj_t *canvas, const struct statu
         snprintf(level_text, sizeof(level_text), "%u", state->central_battery_level);
     }
 
-    lv_canvas_draw_text(canvas, 0, 19, 42, label_dsc, level_text);
+    canvas_draw_text(canvas, 0, 19, 42, label_dsc, level_text);
 
     uint8_t suffix_x = (strlen(level_text) * 7) + 3;
     if (state->central_battery_charging) {
-        lv_canvas_draw_img(canvas, suffix_x, 21, &bolt, img_dsc);
+        canvas_draw_img(canvas, suffix_x, 21, &bolt, img_dsc);
     } else {
-        lv_canvas_draw_text(canvas, suffix_x, 19, 8, label_dsc, "%");
+        canvas_draw_text(canvas, suffix_x, 19, 8, label_dsc, "%");
     }
 }
 #endif
@@ -292,11 +292,11 @@ void draw_battery_status(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_label_dsc_t label_left_dsc;
     init_label_dsc(&label_left_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_LEFT);
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL)
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
     draw_central_battery_peripheral(canvas, state, &label_left_dsc, &img_dsc);
 #else
-    lv_canvas_draw_text(canvas, 0, 19, 25, &label_left_dsc, "BAT");
+    canvas_draw_text(canvas, 0, 19, 25, &label_left_dsc, "BAT");
 #endif
 #endif // CONFIG_NICE_EPAPER_ON
     if (state->charging) {

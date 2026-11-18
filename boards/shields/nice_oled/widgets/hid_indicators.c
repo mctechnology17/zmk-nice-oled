@@ -89,7 +89,7 @@ static void set_hid_indicators(lv_obj_t *label, struct hid_indicators_state stat
     } else {
         // Si LED_CLCK no está activo, y se había creado la animación, la eliminamos
         if (hid_anim) {
-            lv_obj_del(hid_anim);
+            lv_obj_delete(hid_anim);
             hid_anim = NULL;
         }
         lv_label_set_text(label, "");

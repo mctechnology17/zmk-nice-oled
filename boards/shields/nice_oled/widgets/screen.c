@@ -120,7 +120,7 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
 #endif
 
     // Dibuja la cadena de texto final en la pantalla
-    lv_canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, text);
+    canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, text);
 }
 /*
 static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state) {
@@ -141,7 +141,7 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
     char central_text[8];
     memset(central_text, 0, sizeof(central_text)); // Limpia el búfer
     snprintf(central_text, sizeof(central_text), "%d", state->batteries[0].level);
-    lv_canvas_draw_text(canvas, 0, 1, 25, &label_dsc, central_text);
+    canvas_draw_text(canvas, 0, 1, 25, &label_dsc, central_text);
 
     //  Baterías Periféricas
     char peripheral_text[32];
@@ -158,7 +158,7 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
     if (p > peripheral_text) {
         *(p - 1) = '\0'; // Elimina el último espacio
     }
-    lv_canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, peripheral_text);
+    canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, peripheral_text);
 
 #else
     // MODO 2 y 3 (el resto de los casos)
@@ -188,7 +188,7 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
 #endif
 
     // Dibuja la cadena de texto final para los modos 2 y 3
-    lv_canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, text);
+    canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, text);
 #endif
 }
 */
@@ -206,7 +206,7 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
 //  Declaración adelantada (Forward Declaration) para draw_canvas
-static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state);
+static void draw_canvas(lv_obj_t *widget, uint8_t cbuf[], const struct status_state *state);
 //  Fin Declaración adelantada
 
 /**
@@ -294,8 +294,8 @@ static const lv_img_dsc_t *mod_imgs_active[4] = {&control_white_0, &shift_white_
 static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state) {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL)
     // --- MODO SÍMBOLOS (Imágenes reales) ---
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
 
     // Las imágenes son 14x14 píxeles
     const int img_size = 14;
@@ -326,7 +326,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x;
         int current_y = base_y + i * (img_size + spacing);
         const lv_img_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
+        canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_HOR)
@@ -339,7 +339,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + i * (img_size + spacing);
         int current_y = base_y;
         const lv_img_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
+        canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_BOX)
@@ -359,7 +359,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + offsets_box[i][0];
         int current_y = base_y + offsets_box[i][1];
         const lv_img_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
+        canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
     }
 
 #else
@@ -379,7 +379,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + offsets_default[i][0];
         int current_y = base_y + offsets_default[i][1];
         const lv_img_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
+        canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
     }
 #endif
 
@@ -430,13 +430,13 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x;
         int current_y = base_y + i * (box_height + 2);
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
+            canvas_draw_rect(canvas, current_x + inner_box_offset,
                                 current_y + inner_box_offset, inner_box_width, inner_box_height,
                                 &rect_white_dsc);
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
+        canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
                             (selected ? &mod_dsc_black : &mod_dsc), items[i]);
     }
 
@@ -450,13 +450,13 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + i * (box_width + 2);
         int current_y = base_y;
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
+            canvas_draw_rect(canvas, current_x + inner_box_offset,
                                 current_y + inner_box_offset, inner_box_width, inner_box_height,
                                 &rect_white_dsc);
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
+        canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
                             (selected ? &mod_dsc_black : &mod_dsc), items[i]);
     }
 
@@ -474,13 +474,13 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + offsets_box[i][0];
         int current_y = base_y + offsets_box[i][1];
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
+            canvas_draw_rect(canvas, current_x + inner_box_offset,
                                 current_y + inner_box_offset, inner_box_width, inner_box_height,
                                 &rect_white_dsc);
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
+        canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
                             (selected ? &mod_dsc_black : &mod_dsc), items[i]);
     }
 
@@ -498,13 +498,13 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
         int current_x = base_x + offsets_default[i][0];
         int current_y = base_y + offsets_default[i][1];
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
+            canvas_draw_rect(canvas, current_x + inner_box_offset,
                                 current_y + inner_box_offset, inner_box_width, inner_box_height,
                                 &rect_white_dsc);
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
+        canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
                             (selected ? &mod_dsc_black : &mod_dsc), items[i]);
     }
 #endif
@@ -619,7 +619,7 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER)
         // Dibujar Temperatura
         sprintf(text_buffer, "%dC", state->temperature);
-        lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_X,
+        canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_Y,
                             hid_area_width, &label_volume, text_buffer);
 #endif
@@ -627,7 +627,7 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_TIME)
         //  Dibujar Hora
         sprintf(text_buffer, "%02i:%02i", state->hour, state->minute);
-        lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_TIME_CUSTOM_X,
+        canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_TIME_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_TIME_CUSTOM_Y,
                             hid_area_width, &label_time, text_buffer);
 #endif
@@ -652,7 +652,7 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
 #else
         snprintf(layout_str, sizeof(layout_str), "L%i", state->layout);
 #endif
-        lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT_CUSTOM_X,
+        canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT_CUSTOM_Y,
                             hid_area_width, &label_layout, layout_str);
 #endif // CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT
@@ -664,7 +664,7 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
 #else
         sprintf(text_buffer, "V:%i", state->volume);
 #endif // IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-        lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_VOLUME_CUSTOM_X,
+        canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_VOLUME_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_VOLUME_CUSTOM_Y,
                             hid_area_width, &label_volume, text_buffer);
 #endif
@@ -672,13 +672,13 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS) ||                     \
     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
         // Dibujar Spotify/Media Player
-        lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_X,
+        canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_Y,
                             hid_area_width, &label_volume, state->media_player);
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
-        lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP_CUSTOM_X,
+        canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP_CUSTOM_Y,
                             hid_area_width, &label_volume, state->world_cup);
 #endif
@@ -687,21 +687,21 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
         //  Dibuja mensaje "HID not found"
 
         // Dibujar "HID"
-        lv_txt_get_size(&text_size, "HID", label_time.font, label_time.letter_space,
+        lv_text_get_size(&text_size, "HID", label_time.font, label_time.letter_space,
                         label_time.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-        lv_canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_time, "HID");
+        canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_time, "HID");
         current_y += text_size.y + line_gap;
 
         // Dibujar "not"
-        lv_txt_get_size(&text_size, "not", label_layout.font, label_layout.letter_space,
+        lv_text_get_size(&text_size, "not", label_layout.font, label_layout.letter_space,
                         label_layout.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-        lv_canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_layout, "not");
+        canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_layout, "not");
         current_y += text_size.y + line_gap;
 
         // Dibujar "found"
-        lv_txt_get_size(&text_size, "found", label_volume.font, label_volume.letter_space,
+        lv_text_get_size(&text_size, "found", label_volume.font, label_volume.letter_space,
                         label_volume.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-        lv_canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_volume, "found");
+        canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_volume, "found");
     }
 }
 
@@ -891,7 +891,7 @@ static struct zmk_widget_hid_indicators hid_indicators_widget;
  * Draw canvas
  **/
 
-static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
+static void draw_canvas(lv_obj_t *widget, uint8_t cbuf[], const struct status_state *state) {
     lv_obj_t *canvas = lv_obj_get_child(widget, 0);
 
     // Draw widgets
@@ -1101,7 +1101,7 @@ static void output_status_update_cb(struct output_status_state state) {
 
 static struct output_status_state output_status_get_state(const zmk_event_t *_eh) {
     return (struct output_status_state){
-        .selected_endpoint = zmk_endpoints_selected(),
+        .selected_endpoint = zmk_endpoint_get_selected(),
         .active_profile_index = zmk_ble_active_profile_index(),
         .active_profile_connected = zmk_ble_active_profile_is_connected(),
         .active_profile_bonded = !zmk_ble_active_profile_is_open(),
@@ -1181,7 +1181,7 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 
     lv_obj_t *canvas = lv_canvas_create(widget->obj);
     lv_obj_align(canvas, LV_ALIGN_TOP_LEFT, 0, 0);
-    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_HEIGHT, CANVAS_HEIGHT, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_HEIGHT, CANVAS_HEIGHT, CANVAS_COLOR_FORMAT);
 
     sys_slist_append(&widgets, &widget->node);
 

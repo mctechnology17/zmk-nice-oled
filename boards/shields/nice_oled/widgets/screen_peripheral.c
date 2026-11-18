@@ -141,8 +141,8 @@ static const lv_img_dsc_t *mod_imgs_active[4] = {&control_white_0, &shift_white_
 
 static void draw_modifiers_peripheral_status(lv_obj_t *canvas, const struct status_state *state) {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL)
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
 
     const int img_size = 14;
     const int spacing = 2;
@@ -170,7 +170,7 @@ static void draw_modifiers_peripheral_status(lv_obj_t *canvas, const struct stat
         int current_x = base_x;
         int current_y = base_y + i * (img_size + spacing);
         const lv_img_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
+        canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_HOR)
@@ -182,7 +182,7 @@ static void draw_modifiers_peripheral_status(lv_obj_t *canvas, const struct stat
         int current_x = base_x + i * (img_size + spacing);
         int current_y = base_y;
         const lv_img_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
+        canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
     }
 
 #else
@@ -201,7 +201,7 @@ static void draw_modifiers_peripheral_status(lv_obj_t *canvas, const struct stat
         int current_x = base_x + offsets_box[i][0];
         int current_y = base_y + offsets_box[i][1];
         const lv_img_dsc_t *img = selected ? mod_imgs_active[i] : mod_imgs_normal[i];
-        lv_canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
+        canvas_draw_img(canvas, current_x, current_y, img, &img_dsc);
     }
 #endif
 
@@ -247,13 +247,13 @@ static void draw_modifiers_peripheral_status(lv_obj_t *canvas, const struct stat
         int current_x = base_x;
         int current_y = base_y + i * (box_height + 2);
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
+            canvas_draw_rect(canvas, current_x + inner_box_offset,
                                 current_y + inner_box_offset, inner_box_width, inner_box_height,
                                 &rect_white_dsc);
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
+        canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
                             selected ? &mod_dsc_black : &mod_dsc, items[i]);
     }
 
@@ -266,13 +266,13 @@ static void draw_modifiers_peripheral_status(lv_obj_t *canvas, const struct stat
         int current_x = base_x + i * (box_width + 2);
         int current_y = base_y;
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
+            canvas_draw_rect(canvas, current_x + inner_box_offset,
                                 current_y + inner_box_offset, inner_box_width, inner_box_height,
                                 &rect_white_dsc);
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
+        canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
                             selected ? &mod_dsc_black : &mod_dsc, items[i]);
     }
 
@@ -292,13 +292,13 @@ static void draw_modifiers_peripheral_status(lv_obj_t *canvas, const struct stat
         int current_x = base_x + offsets_box[i][0];
         int current_y = base_y + offsets_box[i][1];
 
-        lv_canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
+        canvas_draw_rect(canvas, current_x, current_y, box_width, box_height, &rect_black_dsc);
         if (selected && inner_box_width > 0 && inner_box_height > 0) {
-            lv_canvas_draw_rect(canvas, current_x + inner_box_offset,
+            canvas_draw_rect(canvas, current_x + inner_box_offset,
                                 current_y + inner_box_offset, inner_box_width, inner_box_height,
                                 &rect_white_dsc);
         }
-        lv_canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
+        canvas_draw_text(canvas, current_x, current_y + text_offset_y, box_width,
                             selected ? &mod_dsc_black : &mod_dsc, items[i]);
     }
 #endif
@@ -310,7 +310,7 @@ static void draw_modifiers_peripheral_status(lv_obj_t *canvas, const struct stat
  * Draw canvas
  **/
 
-static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
+static void draw_canvas(lv_obj_t *widget, uint8_t cbuf[], const struct status_state *state) {
     lv_obj_t *canvas = lv_obj_get_child(widget, 0);
 
     // Draw widgets
@@ -355,7 +355,7 @@ static void set_battery_status(struct zmk_widget_screen *widget,
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY)
     if (widget->state.charging) {
         // mostrar
-        // lv_obj_clear_flag(widget->obj, LV_OBJ_FLAG_HIDDEN);
+        // lv_obj_remove_flag(widget->obj, LV_OBJ_FLAG_HIDDEN);
         animation_smart_battery_on(widget->obj);
 
     } else {
@@ -561,7 +561,7 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 
     lv_obj_t *canvas = lv_canvas_create(widget->obj);
     lv_obj_align(canvas, LV_ALIGN_TOP_LEFT, 0, 0);
-    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_HEIGHT, CANVAS_HEIGHT, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_HEIGHT, CANVAS_HEIGHT, CANVAS_COLOR_FORMAT);
 
     sys_slist_append(&widgets, &widget->node);
 

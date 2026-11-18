@@ -72,7 +72,7 @@ config NICE_OLED_WIDGET_STATUS
     bool "Custom nice oled status widget"
     default y
     select LV_USE_LABEL
-    select LV_USE_IMG
+    select LV_USE_IMAGE
     select LV_USE_CANVAS
     select LV_USE_ANIMIMG
     select LV_USE_ANIMATION

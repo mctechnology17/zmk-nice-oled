@@ -8,6 +8,13 @@
 #define CANVAS_WIDTH CONFIG_NICE_OLED_CUSTOM_CANVAS_WIDTH
 #define CANVAS_HEIGHT CONFIG_NICE_OLED_CUSTOM_CANVAS_HEIGHT
 
+// LVGL 9: the canvas is a square of CANVAS_HEIGHT so it can be rotated in place.
+// L8 is the smallest color format supported by lv_draw_sw_rotate.
+#define CANVAS_COLOR_FORMAT LV_COLOR_FORMAT_L8
+#define CANVAS_BUF_SIZE                                                                            \
+    LV_CANVAS_BUF_SIZE(CANVAS_HEIGHT, CANVAS_HEIGHT, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT), \
+                       LV_DRAW_BUF_STRIDE_ALIGN)
+
 #define LVGL_BACKGROUND                                                                            \
     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_INVERTED) ? lv_color_black() : lv_color_white()
 #define LVGL_FOREGROUND                                                                            \
@@ -98,10 +105,20 @@ struct status_state {
 };
 
 void to_uppercase(char *str);
-void rotate_canvas(lv_obj_t *canvas, lv_color_t cbuf[]);
+void rotate_canvas(lv_obj_t *canvas, uint8_t cbuf[]);
 void draw_background(lv_obj_t *canvas);
 void draw_pointer_status(lv_obj_t *canvas, uint8_t x, uint8_t y, uint8_t buttons, uint8_t ripple);
 void init_rect_dsc(lv_draw_rect_dsc_t *rect_dsc, lv_color_t bg_color);
 void init_line_dsc(lv_draw_line_dsc_t *line_dsc, lv_color_t color, uint8_t width);
 void init_label_dsc(lv_draw_label_dsc_t *label_dsc, lv_color_t color, const lv_font_t *font,
                     lv_text_align_t align);
+
+// LVGL 9 has no lv_canvas_draw_* functions: these draw through a layer of the canvas.
+void canvas_draw_line(lv_obj_t *canvas, const lv_point_t points[], uint32_t point_cnt,
+                      lv_draw_line_dsc_t *draw_dsc);
+void canvas_draw_rect(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
+                      lv_draw_rect_dsc_t *draw_dsc);
+void canvas_draw_text(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w,
+                      lv_draw_label_dsc_t *draw_dsc, const char *txt);
+void canvas_draw_img(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, const lv_image_dsc_t *src,
+                     lv_draw_image_dsc_t *draw_dsc);
