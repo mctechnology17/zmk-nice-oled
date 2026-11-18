@@ -1,8 +1,31 @@
-Changelog file for Structures extra.
+Changelog of zmk-nice-oled.
 https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
+
+How the versions work:
+- vX.Y.Z          released from the branch `main`
+- vX.Y.Z-beta.N   public test version from the branch `beta`
+- v0.0.3.N        fixes for ZMK v0.3, from the branch `zmk-v0.3`
+- New work is developed on the branch `dev`
+
+# FEATURES NEXT (not released yet)
+=======================================
+# CHANGES
+- [x] CHANGELOG.txt reorganized: one TODO list, v0.0.3 completed, v0.0.1 added
+
+# TODO
+- [ ] Add a video tutorial to the repository
+- [ ] RGB menu
+- [ ] Orientation compatibility (0, 90, 180, 270 degrees)
+- [ ] More animations and fixed images for periphery
+- [ ] implement rssi for communication between host and central
+- [ ] OS detection with image or animation
+- [ ] update to 4.1
+- [ ] wpm on peripheral
 
 # FEATURES v0.0.3 (Jan 09, 2026)
 =======================================
+Tagged as v0.0.3 on Nov 18, 2026 (last commit of Jan 26, 2026). Tested with ZMK v0.3.
+
 # NEW FEATURES
 - [x] **Bongo Cat for Modifiers Indicators** CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT added
 - [x] **New macro** MODIFIERS_USE_BONGO_CAT for conditional compilation
@@ -18,20 +41,13 @@ https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
 - [x] **New macros** HID_HAS_ANIMATION, MODIFIERS_USE_SYMBOLS, MODIFIERS_USE_LUNA, MODIFIERS_USE_BONGO_CAT, MODIFIERS_USE_NONE for conditional compilation
 - [x] **Changed default** CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT from y to n (no animation by default)
 - [x] **replaced a reference** to CONFIG_NICE_OLED_GEM_ANIMATION_MS, which does not exist, with CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS, which i believe is the (now generic) replacement, thanks @newx-it
+- [x] **HID Indicators position** set with CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_CUSTOM_X and CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_CUSTOM_Y; default values of new and existing variables documented in README.md (Jan 11, 2026)
+- [x] **Kconfig.defconfig** small fix for CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT (Jan 11, 2026)
+- [x] **Static image on the peripheral** missing vim symbol added, thanks @Mrxyx (Jan 26, 2026)
 
 # BREAKING CHANGES
 - [x] HID Indicators no longer shows any animation by default. Users who want Luna or BongoCat must explicitly enable them in their .conf file
 - [x] Modifiers Indicators now requires explicit CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA=y or CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT=y to show animation
-
-+ TODO
-- [ ] Add a video tutorial to the repository
-- [ ] RGB menu
-- [ ] Orientation compatibility (0, 90, 180, 270 degrees)
-- [ ] More animations and fixed images for periphery
-- [ ] implement rssi for communication between host and central
-- [ ] OS detection with image or animation
-- [ ] update to 4.1
-- [ ] wpm on peripheral
 
 # FEATURES v0.0.2 (Dec 15, 2025)
 =======================================
@@ -66,9 +82,6 @@ https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
 - [x] Default values for widgets positions corrected in documentation
 - [x] General Configuration reverted to 'choice' type for clarity
 
-+ TODO
-- [ ] Add a video tutorial to the repository
-- [ ] RGB menu
-- [ ] Orientation compatibility (0, 90, 180, 270 degrees)
-- [ ] More animations and fixed images for periphery
-- [ ] implement rssi for communication between host and central
+# FEATURES v0.0.1 (Dec 15, 2025)
+=======================================
+- [x] Security tag for the snapshot before the update
