@@ -103,23 +103,25 @@ What to write as `revision:` in your `west.yml`:
 | You want | `revision:` |
 |---|---|
 | The latest stable version | `main` |
-| Stay on ZMK v0.3 and keep receiving fixes | `zmk-v0.3` |
+| Stay on ZMK v0.3 | `zmk-v0.3` |
 | A fixed version that never changes | a tag, for example `v0.0.3` |
 | Try what is coming next (it can still change) | `beta` |
 
 Branches:
 
-- `main`: the stable version. It follows the newest ZMK version that the project supports.
-- `zmk-v0.3`: maintenance for ZMK v0.3. It only receives fixes, never new features. When the project moves to a newer ZMK, the next branch is created the same way (`zmk-v0.4`, ...).
+- `main`: the stable version. It follows the newest ZMK version that the project supports. Today that is ZMK v0.3.
+- `zmk-v0.3`: the line for ZMK v0.3. While `main` is on ZMK v0.3 both are the same. When `main` moves to a newer ZMK, this branch stays on ZMK v0.3 and keeps receiving fixes. The next lines are created the same way (`zmk-v0.4`, ...).
 - `beta`: new features in public test before they reach `main`. Feedback is welcome.
 - `dev`: development. It can be broken at any time, do not use it for your keyboard.
 
 Tags:
 
-- `v0.0.3`: the common starting point of all my ZMK projects (Nov 18, 2026), tested with ZMK v0.3.
-- `v0.0.4`, `v0.0.5`, ...: new versions, released from `main`. `v0.0.4` is planned as the update to the newest ZMK.
-- `v0.0.4-beta.1`, `v0.0.4-beta.2`, ...: public test versions, released from `beta`.
-- `v0.0.3.1`, `v0.0.3.2`, ...: fixes for the ZMK v0.3 line, released from `zmk-v0.3` (`v0.0.3.1-fix` while a fix is still being tested).
+The third number of a tag is the ZMK version it is made for:
+
+- `v0.0.3`: the common starting point of all my ZMK projects (Nov 18, 2026), for ZMK v0.3.
+- `v0.0.3.1`, `v0.0.3.2`, ...: the next versions for ZMK v0.3, new features and fixes.
+- `v0.0.4`, `v0.0.4.1`, ...: the versions for the next ZMK version (v0.4).
+- A version that is still being tested carries a suffix: `v0.0.3.1-beta.1` (released from `beta`) or `v0.0.3.1-fix` (a fix under test).
 
 Every release says which ZMK version it was tested with. The full list of changes is in [CHANGELOG.txt](CHANGELOG.txt).
 

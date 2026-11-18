@@ -1,10 +1,10 @@
 Changelog of zmk-nice-oled.
 https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
 
-How the versions work:
-- vX.Y.Z          released from the branch `main`
+How the versions work (the third number is the ZMK version):
+- v0.0.3.N        versions for ZMK v0.3 (branch `zmk-v0.3`, and `main` while it is on ZMK v0.3)
+- v0.0.4.N        versions for the next ZMK version (v0.4)
 - vX.Y.Z-beta.N   public test version from the branch `beta`
-- v0.0.3.N        fixes for ZMK v0.3, from the branch `zmk-v0.3`
 - New work is developed on the branch `dev`
 
 # FEATURES NEXT (not released yet)
