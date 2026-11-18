@@ -12,8 +12,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zmk/display.h>
 #include <zmk/event_manager.h>
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_BONGO_CAT)
+#include <zmk/events/wpm_peripheral_state_changed.h>
+#include <zmk/wpm_peripheral.h>
+#else
 #include <zmk/events/wpm_state_changed.h>
 #include <zmk/wpm.h>
+#endif
 
 #include "bongo_cat.h"
 
@@ -133,8 +138,12 @@ static void set_animation(lv_obj_t *animing, struct wpm_bongo_cat_status_state s
 }
 
 struct wpm_bongo_cat_status_state wpm_bongo_cat_status_get_state(const zmk_event_t *eh) {
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_BONGO_CAT)
+    return (struct wpm_bongo_cat_status_state){.wpm = zmk_wpm_peripheral_get_state()};
+#else
     struct zmk_wpm_state_changed *ev = as_zmk_wpm_state_changed(eh);
     return (struct wpm_bongo_cat_status_state){.wpm = ev->state};
+#endif
 };
 
 void wpm_bongo_cat_status_update_cb(struct wpm_bongo_cat_status_state state) {
@@ -145,7 +154,11 @@ void wpm_bongo_cat_status_update_cb(struct wpm_bongo_cat_status_state state) {
 ZMK_DISPLAY_WIDGET_LISTENER(widget_wpm_bongo_cat, struct wpm_bongo_cat_status_state,
                             wpm_bongo_cat_status_update_cb, wpm_bongo_cat_status_get_state)
 
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_BONGO_CAT)
+ZMK_SUBSCRIPTION(widget_wpm_bongo_cat, zmk_wpm_peripheral_state_changed);
+#else
 ZMK_SUBSCRIPTION(widget_wpm_bongo_cat, zmk_wpm_state_changed);
+#endif
 
 int zmk_widget_wpm_bongo_cat_init(struct zmk_widget_wpm_bongo_cat *widget, lv_obj_t *parent) {
     widget->obj = lv_animimg_create(parent);
@@ -154,6 +167,7 @@ int zmk_widget_wpm_bongo_cat_init(struct zmk_widget_wpm_bongo_cat *widget, lv_ob
     sys_slist_append(&widgets, &widget->node);
 
     widget_wpm_bongo_cat_init();
+    set_animation(widget->obj, (struct wpm_bongo_cat_status_state){0});
 
     return 0;
 }

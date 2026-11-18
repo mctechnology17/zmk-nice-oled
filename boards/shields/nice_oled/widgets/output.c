@@ -1,12 +1,19 @@
 #include "output.h"
 // #include "../assets/custom_fonts.h"
+#include <stdio.h>
 #include <fonts.h>
 #include <zephyr/kernel.h>
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL) &&                              \
+    IS_ENABLED(CONFIG_ZMK_SPLIT) && !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+#include <zmk/peripheral_status_sync.h>
+#endif
 
 LV_IMG_DECLARE(bt_no_signal);
 LV_IMG_DECLARE(bt_unbonded);
 LV_IMG_DECLARE(bt);
 LV_IMG_DECLARE(usb);
+LV_IMG_DECLARE(bolt);
 
 #if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
 static void draw_usb_connected(lv_obj_t *canvas) {

@@ -17,6 +17,10 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/keymap.h>
 #include <zmk/usb.h>
 #include <zmk/wpm.h>
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_POINTER_STATUS)
+#include <zmk/events/pointer_status_changed.h>
+#include <zmk/pointer_status.h>
+#endif
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ALL) ||                     \
     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ONLY) ||                    \
     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_AND_CENTRAL)
@@ -237,7 +241,8 @@ static struct zmk_widget_wpm_bongo_cat wpm_bongo_cat_widget;
  * responsive bongo cat
  **/
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT) ||                                   \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CENTRAL)
 #include "responsive_bongo_cat.h"
 static struct zmk_widget_responsive_bongo_cat responsive_bongo_cat_widget;
 #endif
@@ -664,11 +669,18 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
                             hid_area_width, &label_volume, text_buffer);
 #endif
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS) ||                     \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
         // Dibujar Spotify/Media Player
         lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_Y,
                             hid_area_width, &label_volume, state->media_player);
+#endif
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
+        lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP_CUSTOM_X,
+                            CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP_CUSTOM_Y,
+                            hid_area_width, &label_volume, state->world_cup);
 #endif
 
     } else {
@@ -816,7 +828,8 @@ ZMK_SUBSCRIPTION(widget_weather_status, weather_notification);
 
 #endif
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS) ||                     \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
 
 static void spotify_status_update_cb(struct spotify_notification spotify) {
     struct zmk_widget_screen *widget;
@@ -838,6 +851,30 @@ static struct spotify_notification spotify_status_get_state(const zmk_event_t *e
 ZMK_DISPLAY_WIDGET_LISTENER(widget_spotify_status, struct spotify_notification,
                             spotify_status_update_cb, spotify_status_get_state);
 ZMK_SUBSCRIPTION(widget_spotify_status, spotify_notification);
+
+#endif
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
+
+static void world_cup_status_update_cb(struct world_cup_notification world_cup) {
+    struct zmk_widget_screen *widget;
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
+        memcpy(widget->state.world_cup, world_cup.score, sizeof(widget->state.world_cup));
+        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    }
+}
+
+static struct world_cup_notification world_cup_status_get_state(const zmk_event_t *eh) {
+    const struct world_cup_notification *ev = as_world_cup_notification(eh);
+    if (ev == NULL) {
+        return (struct world_cup_notification){.score = ""};
+    }
+    return *ev;
+}
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_world_cup_status, struct world_cup_notification,
+                            world_cup_status_update_cb, world_cup_status_get_state);
+ZMK_SUBSCRIPTION(widget_world_cup_status, world_cup_notification);
 
 #endif
 
@@ -889,6 +926,11 @@ static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status
     // Dibuja los modificadores si la nueva Kconfig está habilitada
     draw_mods_status(canvas, state);
 #endif // <-- NUEVO
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_POINTER_STATUS)
+    draw_pointer_status(canvas, state->pointer_x, state->pointer_y, state->pointer_buttons,
+                        state->pointer_ripple);
+#endif
 
     // Rotate for horizontal display
     rotate_canvas(canvas, cbuf);
@@ -1105,6 +1147,30 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_wpm_status, struct wpm_status_state, wpm_stat
 ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
 
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_POINTER_STATUS)
+static void set_pointer_status(struct zmk_widget_screen *widget,
+                               struct zmk_pointer_status_state state) {
+    widget->state.pointer_x = state.x;
+    widget->state.pointer_y = state.y;
+    widget->state.pointer_buttons = state.buttons;
+    widget->state.pointer_ripple = state.ripple;
+    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+}
+
+static void pointer_status_update_cb(struct zmk_pointer_status_state state) {
+    struct zmk_widget_screen *widget;
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_pointer_status(widget, state); }
+}
+
+static struct zmk_pointer_status_state pointer_status_get_state(const zmk_event_t *eh) {
+    return zmk_pointer_status_get_state();
+}
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_pointer_status, struct zmk_pointer_status_state,
+                            pointer_status_update_cb, pointer_status_get_state)
+ZMK_SUBSCRIPTION(widget_pointer_status, zmk_pointer_status_changed);
+#endif
+
 /**
  * Initialization
  **/
@@ -1128,6 +1194,9 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
     widget_wpm_status_init();
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_POINTER_STATUS)
+    widget_pointer_status_init();
+#endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
 
@@ -1143,10 +1212,16 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT) ||                                   \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CENTRAL)
     zmk_widget_responsive_bongo_cat_init(&responsive_bongo_cat_widget, canvas);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_VERTICAL)
     lv_obj_align(zmk_widget_responsive_bongo_cat_obj(&responsive_bongo_cat_widget),
                  LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CUSTOM_Y);
+#else
+    lv_obj_align(zmk_widget_responsive_bongo_cat_obj(&responsive_bongo_cat_widget),
+                 LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_CUSTOM_Y);
+#endif
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_HID_INDICATORS)
@@ -1175,8 +1250,12 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER)
     widget_weather_status_init();
 #endif
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS) ||                     \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
     widget_spotify_status_init();
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
+    widget_world_cup_status_init();
 #endif
 
     // Inicializa el estado HID a "desconectado" para el primer dibujo
@@ -1188,8 +1267,12 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER)
         w->state.temperature = 127; // Estado inicial para el clima (N/A)
 #endif
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS) ||                     \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
         w->state.media_player[0] = '\0';
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
+        w->state.world_cup[0] = '\0';
 #endif
         // Otros campos HID se inicializarán a 0 o sus valores por defecto
     }

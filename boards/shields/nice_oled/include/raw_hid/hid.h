@@ -28,7 +28,15 @@ struct weather_notification {
 };
 ZMK_EVENT_DECLARE(weather_notification);
 
-#ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
+struct world_cup_notification {
+    char score[24];
+};
+ZMK_EVENT_DECLARE(world_cup_notification);
+#endif
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS) ||                     \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
 struct spotify_notification {
     char media_player[11];
 };

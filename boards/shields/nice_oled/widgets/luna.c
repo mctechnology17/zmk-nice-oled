@@ -12,8 +12,15 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zmk/display.h>
 #include <zmk/event_manager.h>
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL) &&                                          \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_LUNA) && IS_ENABLED(CONFIG_ZMK_SPLIT) &&      \
+    !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+#include <zmk/events/wpm_peripheral_state_changed.h>
+#include <zmk/wpm_peripheral.h>
+#else
 #include <zmk/events/wpm_state_changed.h>
 #include <zmk/wpm.h>
+#endif
 
 #include "luna.h"
 
@@ -107,8 +114,14 @@ static void set_animation(lv_obj_t *animing, struct luna_wpm_status_state state)
 }
 
 struct luna_wpm_status_state luna_wpm_status_get_state(const zmk_event_t *eh) {
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL) &&                                          \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_LUNA) && IS_ENABLED(CONFIG_ZMK_SPLIT) &&      \
+    !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+    return (struct luna_wpm_status_state){.wpm = zmk_wpm_peripheral_get_state()};
+#else
     struct zmk_wpm_state_changed *ev = as_zmk_wpm_state_changed(eh);
     return (struct luna_wpm_status_state){.wpm = ev->state};
+#endif
 };
 
 void luna_wpm_status_update_cb(struct luna_wpm_status_state state) {
@@ -119,7 +132,13 @@ void luna_wpm_status_update_cb(struct luna_wpm_status_state state) {
 ZMK_DISPLAY_WIDGET_LISTENER(widget_luna, struct luna_wpm_status_state, luna_wpm_status_update_cb,
                             luna_wpm_status_get_state)
 
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL) &&                                          \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_LUNA) && IS_ENABLED(CONFIG_ZMK_SPLIT) &&      \
+    !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+ZMK_SUBSCRIPTION(widget_luna, zmk_wpm_peripheral_state_changed);
+#else
 ZMK_SUBSCRIPTION(widget_luna, zmk_wpm_state_changed);
+#endif
 
 int zmk_widget_luna_init(struct zmk_widget_luna *widget, lv_obj_t *parent) {
     widget->obj = lv_animimg_create(parent);

@@ -13,6 +13,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/display.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/hid_indicators_changed.h>
+
+#if IS_ENABLED(CONFIG_ZMK_PERIPHERAL_STATUS_SYNC) && IS_ENABLED(CONFIG_ZMK_SPLIT) &&               \
+    !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+#include <zmk/events/central_hid_indicators_peripheral_state_changed.h>
+#include <zmk/peripheral_status_sync.h>
+#endif
+
 #include "hid_indicators.h"
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
@@ -102,8 +109,18 @@ void hid_indicators_update_cb(struct hid_indicators_state state) {
 
 static struct hid_indicators_state hid_indicators_get_state(const zmk_event_t *eh) {
     struct zmk_hid_indicators_changed *ev = as_zmk_hid_indicators_changed(eh);
+#if IS_ENABLED(CONFIG_ZMK_PERIPHERAL_STATUS_SYNC) && IS_ENABLED(CONFIG_ZMK_SPLIT) &&               \
+    !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+    const struct zmk_central_hid_indicators_peripheral_state_changed *central_ev =
+        as_zmk_central_hid_indicators_peripheral_state_changed(eh);
+
+    if (central_ev != NULL) {
+        return (struct hid_indicators_state){.hid_indicators = central_ev->indicators};
+    }
+#endif
+
     return (struct hid_indicators_state){
-        .hid_indicators = ev->indicators,
+        .hid_indicators = ev != NULL ? ev->indicators : 0,
     };
 }
 
@@ -111,6 +128,10 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_hid_indicators, struct hid_indicators_state,
                             hid_indicators_update_cb, hid_indicators_get_state)
 
 ZMK_SUBSCRIPTION(widget_hid_indicators, zmk_hid_indicators_changed);
+#if IS_ENABLED(CONFIG_ZMK_PERIPHERAL_STATUS_SYNC) && IS_ENABLED(CONFIG_ZMK_SPLIT) &&               \
+    !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+ZMK_SUBSCRIPTION(widget_hid_indicators, zmk_central_hid_indicators_peripheral_state_changed);
+#endif
 
 int zmk_widget_hid_indicators_init(struct zmk_widget_hid_indicators *widget, lv_obj_t *parent) {
     widget->obj = lv_label_create(parent);

@@ -31,6 +31,38 @@ void draw_background(lv_obj_t *canvas) {
                       &rect_black_dsc);
 }
 
+void draw_pointer_status(lv_obj_t *canvas, uint8_t x, uint8_t y, uint8_t buttons, uint8_t ripple) {
+  lv_draw_line_dsc_t line_dsc;
+  init_line_dsc(&line_dsc, LVGL_FOREGROUND, buttons ? 2 : 1);
+
+  int px = MIN(x, CANVAS_WIDTH - 1);
+  int py = MIN(y, CANVAS_HEIGHT - 1);
+  int left = MAX(px - 2, 0);
+  int right = MIN(px + 2, CANVAS_WIDTH - 1);
+  int top = MAX(py - 2, 0);
+  int bottom = MIN(py + 2, CANVAS_HEIGHT - 1);
+
+  lv_point_t h_points[] = {{left, py}, {right, py}};
+  lv_point_t v_points[] = {{px, top}, {px, bottom}};
+  lv_canvas_draw_line(canvas, h_points, 2, &line_dsc);
+  lv_canvas_draw_line(canvas, v_points, 2, &line_dsc);
+
+  if (ripple > 0) {
+    lv_draw_rect_dsc_t rect_dsc;
+    init_rect_dsc(&rect_dsc, LVGL_BACKGROUND);
+    rect_dsc.border_color = LVGL_FOREGROUND;
+    rect_dsc.border_width = 1;
+    rect_dsc.bg_opa = LV_OPA_TRANSP;
+
+    int radius = 2 + ripple;
+    int rx = MAX(px - radius, 0);
+    int ry = MAX(py - radius, 0);
+    int rw = MIN((radius * 2) + 1, CANVAS_WIDTH - rx);
+    int rh = MIN((radius * 2) + 1, CANVAS_HEIGHT - ry);
+    lv_canvas_draw_rect(canvas, rx, ry, rw, rh, &rect_dsc);
+  }
+}
+
 void init_label_dsc(lv_draw_label_dsc_t *label_dsc, lv_color_t color,
                     const lv_font_t *font, lv_text_align_t align) {
   lv_draw_label_dsc_init(label_dsc);

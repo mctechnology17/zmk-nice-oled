@@ -11,8 +11,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zmk/display.h>
 #include <zmk/event_manager.h>
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS)
+#include <zmk/events/modifiers_peripheral_state_changed.h>
+#include <zmk/modifiers_peripheral.h>
+#else
 #include <zmk/events/keycode_state_changed.h>
 #include <zmk/hid.h>
+#endif
 #include <dt-bindings/zmk/modifiers.h>
 
 #include "modifiers.h"
@@ -87,7 +92,8 @@ const lv_img_dsc_t *symbol_imgs_shift[] = {&shift_0, &shift_white_0};
 #endif
 #define MODIFIERS_USE_SYMBOLS 1
 
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT)
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT) ||                        \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT)
 
 LV_IMG_DECLARE(bongo_cat_double_tap1_06);
 LV_IMG_DECLARE(bongo_cat_tap1_03);
@@ -109,7 +115,8 @@ const lv_img_dsc_t *bongo_imgs_shift[] = {&bongo_cat_double_tap1_03, &bongo_cat_
 static lv_obj_t *bongo_imgs = NULL; // Variable estática para almacenar el objeto animado
 #define MODIFIERS_USE_BONGO_CAT 1
 
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA)
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA) ||                             \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA)
 
 LV_IMG_DECLARE(dog_sit1_90);
 LV_IMG_DECLARE(dog_sit2_90);
@@ -135,7 +142,11 @@ static lv_obj_t *luna_imgs = NULL; // Variable estática para almacenar el objet
 #endif
 
 static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) {
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS)
+    uint8_t mods = zmk_modifiers_peripheral_get_state();
+#else
     uint8_t mods = zmk_hid_get_explicit_mods();
+#endif
     /* Limpiamos el texto del label, ya que se usarán imágenes fijas */
     lv_label_set_text(label, "");
 
@@ -150,8 +161,13 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
 
     /* Creación de los objetos de imagen (si aún no existen) */
     // Offset base para posicionamiento vertical de símbolos
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS)
+    const int base_x = 0;
+    const int base_y = 0;
+#else
     const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
     const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
+#endif
 
     if (!fixed_ctl) {
         fixed_ctl = lv_img_create(label);
@@ -175,7 +191,8 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
     }
 
     /* Actualizar la fuente de cada imagen según el estado de cada modificador */
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_WINDOWS)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_WINDOWS) ||               \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL_WINDOWS)
     /* Para Windows/Command: si alguno de los mods está activo, usar la imagen blanca */
     lv_img_set_src(fixed_win,
                    (mods & (MOD_LGUI | MOD_RGUI)) ? symbol_imgs_win[1] : symbol_imgs_win[0]);
@@ -201,7 +218,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             lv_obj_center(bongo_imgs);
             lv_animimg_set_src(bongo_imgs, (const void **)bongo_imgs_gui, 2);
             lv_animimg_set_duration(bongo_imgs,
-                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT)
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT_ANIMATION_MS
+#else
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS
+#endif
+            );
             lv_animimg_set_repeat_count(bongo_imgs, LV_ANIM_REPEAT_INFINITE);
             lv_animimg_start(bongo_imgs);
             lv_obj_align(bongo_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y);
@@ -212,7 +234,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             lv_obj_center(bongo_imgs);
             lv_animimg_set_src(bongo_imgs, (const void **)bongo_imgs_alt, 2);
             lv_animimg_set_duration(bongo_imgs,
-                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT)
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT_ANIMATION_MS
+#else
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS
+#endif
+            );
             lv_animimg_set_repeat_count(bongo_imgs, LV_ANIM_REPEAT_INFINITE);
             lv_animimg_start(bongo_imgs);
             lv_obj_align(bongo_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y);
@@ -223,7 +250,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             lv_obj_center(bongo_imgs);
             lv_animimg_set_src(bongo_imgs, (const void **)bongo_imgs_ctrl, 2);
             lv_animimg_set_duration(bongo_imgs,
-                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT)
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT_ANIMATION_MS
+#else
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS
+#endif
+            );
             lv_animimg_set_repeat_count(bongo_imgs, LV_ANIM_REPEAT_INFINITE);
             lv_animimg_start(bongo_imgs);
             lv_obj_align(bongo_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y);
@@ -234,7 +266,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             lv_obj_center(bongo_imgs);
             lv_animimg_set_src(bongo_imgs, (const void **)bongo_imgs_shift, 2);
             lv_animimg_set_duration(bongo_imgs,
-                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT)
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT_ANIMATION_MS
+#else
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_BONGO_CAT_ANIMATION_MS
+#endif
+            );
             lv_animimg_set_repeat_count(bongo_imgs, LV_ANIM_REPEAT_INFINITE);
             lv_animimg_start(bongo_imgs);
             lv_obj_align(bongo_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_BONGO_CAT_CUSTOM_Y);
@@ -254,7 +291,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             lv_obj_center(luna_imgs);
             lv_animimg_set_src(luna_imgs, (const void **)luna_imgs_sit_90, 2);
             lv_animimg_set_duration(luna_imgs,
-                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA)
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA_ANIMATION_MS
+#else
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS
+#endif
+            );
             lv_animimg_set_repeat_count(luna_imgs, LV_ANIM_REPEAT_INFINITE);
             lv_animimg_start(luna_imgs);
             lv_obj_align(luna_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_Y);
@@ -265,7 +307,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             lv_obj_center(luna_imgs);
             lv_animimg_set_src(luna_imgs, (const void **)luna_imgs_walk_90, 2);
             lv_animimg_set_duration(luna_imgs,
-                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA)
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA_ANIMATION_MS
+#else
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS
+#endif
+            );
             lv_animimg_set_repeat_count(luna_imgs, LV_ANIM_REPEAT_INFINITE);
             lv_animimg_start(luna_imgs);
             lv_obj_align(luna_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_Y);
@@ -276,7 +323,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             lv_obj_center(luna_imgs);
             lv_animimg_set_src(luna_imgs, (const void **)luna_imgs_run_90, 2);
             lv_animimg_set_duration(luna_imgs,
-                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA)
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA_ANIMATION_MS
+#else
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS
+#endif
+            );
             lv_animimg_set_repeat_count(luna_imgs, LV_ANIM_REPEAT_INFINITE);
             lv_animimg_start(luna_imgs);
             lv_obj_align(luna_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_Y);
@@ -287,7 +339,12 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
             lv_obj_center(luna_imgs);
             lv_animimg_set_src(luna_imgs, (const void **)luna_imgs_sneak_90, 2);
             lv_animimg_set_duration(luna_imgs,
-                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS);
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA)
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA_ANIMATION_MS
+#else
+                                    CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS
+#endif
+            );
             lv_animimg_set_repeat_count(luna_imgs, LV_ANIM_REPEAT_INFINITE);
             lv_animimg_start(luna_imgs);
             lv_obj_align(luna_imgs, LV_ALIGN_TOP_LEFT, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_LUNA_CUSTOM_Y);
@@ -321,13 +378,21 @@ static void modifiers_update_cb(struct modifiers_state state) {
  * @return Estructura con el estado de los modificadores.
  */
 static struct modifiers_state modifiers_get_state(const zmk_event_t *eh) {
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS)
+    return (struct modifiers_state){.modifiers = zmk_modifiers_peripheral_get_state()};
+#else
     return (struct modifiers_state){.modifiers = zmk_hid_get_explicit_mods()};
+#endif
 }
 
 /* Registra el listener para actualizar el widget cuando cambie el estado de los modificadores */
 ZMK_DISPLAY_WIDGET_LISTENER(widget_modifiers, struct modifiers_state, modifiers_update_cb,
                             modifiers_get_state)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS)
+ZMK_SUBSCRIPTION(widget_modifiers, zmk_modifiers_peripheral_state_changed);
+#else
 ZMK_SUBSCRIPTION(widget_modifiers, zmk_keycode_state_changed);
+#endif
 
 /**
  * Inicializa el widget de modificadores.
@@ -341,5 +406,8 @@ int zmk_widget_modifiers_init(struct zmk_widget_modifiers *widget, lv_obj_t *par
     widget->obj = lv_label_create(parent);
     sys_slist_append(&widgets, &widget->node);
     widget_modifiers_init();
+    set_modifiers_text(widget->obj, (struct modifiers_state){0});
     return 0;
 }
+
+lv_obj_t *zmk_widget_modifiers_obj(struct zmk_widget_modifiers *widget) { return widget->obj; }

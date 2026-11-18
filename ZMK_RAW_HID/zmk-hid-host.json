@@ -13,5 +13,9 @@
   "weather": {
     "url": "wttr.in/Hamburg?format=%t"
 
+  },
+  "worldCup": {
+    "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard",
+    "updateIntervalSeconds": 30
   }
 }

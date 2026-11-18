@@ -7,8 +7,21 @@ How the versions work (the third number is the ZMK version):
 - vX.Y.Z-beta.N   public test version from the branch `beta`
 - New work is developed on the branch `dev`
 
-# FEATURES NEXT (not released yet)
+# FEATURES NEXT (not released yet, planned as v0.0.3.1 · ZMK v0.3)
 =======================================
+# NEW FEATURES
+- [x] **Peripheral widgets** WPM (number, Luna, Bongo Cat), modifiers, layer, BLE profile, central battery and pointer status on the peripheral half. They need the state modules of the central-to-peripheral sync and stay disabled without them
+- [x] **Responsive Bongo Cat** for central and peripheral, synced from the central, vertical option and idle timeout (idle / tap1 / tap2 frames)
+- [x] **Smart battery animation on the peripheral** selectors GEM, CAT, HEAD, POKEMON and SPACEMAN
+- [x] **Raw HID** media player for Linux and World Cup widget
+
+# FIXES
+- [x] **Smart battery** no more freezes after charger connect / disconnect cycles (LVGL objects are reused)
+- [x] **Responsive Bongo Cat** no longer skips every other tap
+
+# BREAKING CHANGES
+- [x] CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM is replaced by CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL, which needs the WPM state module
+
 # CHANGES
 - [x] README: versions, branches and tags explained
 - [x] CHANGELOG.txt reorganized: one TODO list, v0.0.3 completed, v0.0.1 added

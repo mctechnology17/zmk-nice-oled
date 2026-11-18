@@ -10,7 +10,11 @@ ZMK_EVENT_IMPL(is_connected_notification);
 ZMK_EVENT_IMPL(time_notification);
 ZMK_EVENT_IMPL(volume_notification);
 ZMK_EVENT_IMPL(weather_notification); // NUEVO
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
+ZMK_EVENT_IMPL(world_cup_notification);
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS) ||                     \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
 ZMK_EVENT_IMPL(spotify_notification);
 #endif
 #ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT
@@ -24,6 +28,12 @@ typedef enum {
     _WEATHER = 0xAF, // NUEVO
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
     _SPOTIFY = 0xAE,
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
+    _MEDIA_PLAYER_LINUX = 0xB0,
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
+    _WORLD_CUP = 0xB1,
 #endif
 } hid_data_type;
 
@@ -90,8 +100,27 @@ static void process_raw_hid_data(uint8_t *data) {
         raise_weather_notification((struct weather_notification){.temperature = (int8_t)data[1]});
         break;
 
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WORLD_CUP)
+    case _WORLD_CUP: {
+        struct world_cup_notification notification;
+        memcpy(notification.score, &data[1], sizeof(notification.score));
+        notification.score[sizeof(notification.score) - 1] = '\0';
+        raise_world_cup_notification(notification);
+        break;
+    }
+#endif
+
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
     case _SPOTIFY: {
+        struct spotify_notification notification;
+        memcpy(notification.media_player, &data[1], sizeof(notification.media_player));
+        notification.media_player[sizeof(notification.media_player) - 1] = '\0';
+        raise_spotify_notification(notification);
+        break;
+    }
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
+    case _MEDIA_PLAYER_LINUX: {
         struct spotify_notification notification;
         memcpy(notification.media_player, &data[1], sizeof(notification.media_player));
         notification.media_player[sizeof(notification.media_player) - 1] = '\0';

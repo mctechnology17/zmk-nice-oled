@@ -102,18 +102,239 @@ config NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY
     bool "Enable animation on peripheral"
     default n
-##}}}
-### NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM {{{
-config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM
-    bool "Enable PERIPHERAL WPM widget compatibility"
+
+if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY
+
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_CAT
+    bool "Use cat animation for peripheral smart battery"
     default n
 
-if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_HEAD
+    bool "Use head animation for peripheral smart battery"
+    default n
 
-config NICE_OLED_WIDGET_STATUS
-    select ZMK_WPM
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_POKEMON
+    bool "Use pokemon animation for peripheral smart battery"
+    default n
 
-endif
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_SPACEMAN
+    bool "Use spaceman animation for peripheral smart battery"
+    default n
+
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_GEM
+    bool "Use gem animation for peripheral smart battery"
+    default y if !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_CAT && !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_HEAD && !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_POKEMON && !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_SPACEMAN
+    default n
+
+endif # NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY
+##}}}
+### NICE OLED WIDGET WPM ON PERIPHERAL {{{
+if ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+
+config NICE_OLED_WIDGET_WPM_PERIPHERAL
+    bool "Enable Nice OLED WPM Widget on peripheral"
+    depends on ZMK_WPM_PERIPHERAL
+    default n
+
+if NICE_OLED_WIDGET_WPM_PERIPHERAL
+
+config NICE_OLED_WIDGET_WPM_PERIPHERAL_NUMBER
+    bool "Enable NUMBER for peripheral WPM"
+    select ZMK_WIDGET_WPM_PERIPHERAL_STATUS
+    default n
+
+config NICE_OLED_WIDGET_WPM_PERIPHERAL_LUNA
+    bool "Enable peripheral wpm luna"
+    default n
+
+if NICE_OLED_WIDGET_WPM_PERIPHERAL_LUNA
+
+config NICE_OLED_WIDGET_WPM_PERIPHERAL_LUNA_ANIMATION_MS
+    int "Luna Animation in ms for peripheral WPM Widget"
+    default 300
+
+endif # NICE_OLED_WIDGET_WPM_PERIPHERAL_LUNA
+
+config NICE_OLED_WIDGET_WPM_PERIPHERAL_BONGO_CAT
+    bool "Enable peripheral wpm bongo cat"
+    default n
+
+if NICE_OLED_WIDGET_WPM_PERIPHERAL_BONGO_CAT
+
+config NICE_OLED_WIDGET_WPM_PERIPHERAL_BONGO_CAT_ANIMATION_MS
+    int "Bongo Cat Animation in ms for peripheral WPM Widget"
+    default 300
+
+endif # NICE_OLED_WIDGET_WPM_PERIPHERAL_BONGO_CAT
+
+endif # NICE_OLED_WIDGET_WPM_PERIPHERAL
+
+endif # ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+##}}}
+### NICE OLED WIDGET MODIFIERS PERIPHERAL INDICATORS {{{
+if ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+
+config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS
+    bool "Enable peripheral modifiers indicators"
+    default n
+
+if NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS
+
+config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED
+    bool "Enable peripheral modifiers indicators fixed"
+    default n if NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA
+    default n if NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT
+    default y
+
+if NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED
+
+choice NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_STYLE
+    prompt "Peripheral Modifiers Style"
+    default NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_LETTER
+        bool "Letter (e.g. C S A G)"
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL
+        bool "Symbol (Icons)"
+endchoice
+
+choice NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_LAYOUT
+    prompt "Peripheral Modifiers Layout"
+    default NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_BOX
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_HOR
+        bool "Horizontal (One Line)"
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_VER
+        bool "Vertical (Stacked)"
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_BOX
+        bool "Box (2x2 Grid)"
+endchoice
+
+if NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_VER
+
+choice NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_VER_ALIGN
+    prompt "Peripheral Vertical Layout Alignment"
+    default NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_VER_ALIGN_CENTER
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_VER_ALIGN_LEFT
+        bool "Left"
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_VER_ALIGN_CENTER
+        bool "Center"
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_VER_ALIGN_RIGHT
+        bool "Right"
+endchoice
+
+endif # NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_VER
+
+choice NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL_OS
+    prompt "Peripheral Symbol OS Style"
+    default NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL_MACOS
+    depends on NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL_MACOS
+        bool "macOS (Cmd/Opt symbols)"
+
+    config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED_SYMBOL_WINDOWS
+        bool "Windows (Win/Alt symbols)"
+endchoice
+
+
+endif # NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_FIXED
+
+config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA
+    bool "Enable peripheral modifiers indicators luna"
+    default n
+
+if NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA
+
+config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA_ANIMATION_MS
+    int "Luna Animation in ms for Peripheral Modifiers Indicators"
+    default 300
+
+endif # NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_LUNA
+
+config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT
+    bool "Enable peripheral modifiers indicators bongo cat"
+    default n
+
+if NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT
+
+config NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT_ANIMATION_MS
+    int "Bongo Cat Animation in ms for Peripheral Modifiers Indicators"
+    default 300
+
+endif # NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS_BONGO_CAT
+
+endif # NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS
+
+endif # ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+##}}}
+### NICE OLED WIDGET LAYER PERIPHERAL {{{
+if ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+
+config NICE_OLED_WIDGET_LAYER_PERIPHERAL
+    bool "Enable peripheral layer widget"
+    depends on ZMK_LAYER_PERIPHERAL
+    default n
+
+endif # ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+##}}}
+### NICE OLED WIDGET CENTRAL BATTERY PERIPHERAL {{{
+if ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+
+config NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL
+    bool "Enable central battery widget on peripheral"
+    depends on ZMK_PERIPHERAL_STATUS_SYNC
+    default n
+
+if NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL
+
+config NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL_CUSTOM_X
+    int "Central battery widget X position on peripheral"
+    default 0
+
+config NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL_CUSTOM_Y
+    int "Central battery widget Y position on peripheral"
+    default 28
+
+endif # NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL
+
+endif # ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+##}}}
+### NICE OLED WIDGET POINTER PERIPHERAL {{{
+if ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+
+config NICE_OLED_WIDGET_POINTER_STATUS_PERIPHERAL
+    bool "Enable peripheral pointer status widget"
+    depends on ZMK_POINTER_STATUS
+    default n
+
+endif # ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+##}}}
+### NICE OLED WIDGET PROFILE PERIPHERAL {{{
+if ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+
+config NICE_OLED_WIDGET_PROFILE_PERIPHERAL
+    bool "Enable peripheral profile widget"
+    depends on ZMK_PROFILE_PERIPHERAL
+    default n
+
+if NICE_OLED_WIDGET_PROFILE_PERIPHERAL
+
+config NICE_OLED_WIDGET_PROFILE_PERIPHERAL_BIG
+    bool "Enable peripheral profile widget bigger"
+    default y if NICE_EPAPER_ON
+    default y if NICE_CUSTOM_ON
+    default n
+
+endif # NICE_OLED_WIDGET_PROFILE_PERIPHERAL
+
+endif # ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
 ##}}}
 ### NICE_OLED_WIDGET_ANIMATION_PERIPHERAL || NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL {{{
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL
@@ -149,11 +370,17 @@ config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN
 
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS
     int "Animation length in milliseconds"
+    default 10000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_POKEMON
     default 10000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON
+    default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_HEAD
     default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD
+    default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_SPACEMAN
     default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN
+    default 960 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_GEM
     default 960 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM
+    default 960 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_CAT
     default 960 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT
+    default 960
 endif # NICE_OLED_WIDGET_ANIMATION_PERIPHERAL
 
 if NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL
@@ -241,6 +468,12 @@ config NICE_OLED_WIDGET_WPM_BONGO_CAT_ANIMATION_MS
 
 endif # NICE_OLED_WIDGET_WPM_BONGO_CAT }}}
 endif # NICE_OLED_WIDGET_WPM }}}
+### NICE OLED WIDGET POINTER STATUS {{{
+config NICE_OLED_WIDGET_POINTER_STATUS
+    bool "Enable pointer status widget"
+    depends on ZMK_POINTER_STATUS
+    default n
+##}}}
 ### NICE_OLED_WIDGET_RESPONSIVE {{{
 config NICE_OLED_WIDGET_RESPONSIVE
     bool "Enable widget responsive"
@@ -257,15 +490,53 @@ config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
 config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
     default 3
 
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CENTRAL
+    bool "Enable responsive bongo cat on central"
+    default n
+    help
+      Show the responsive bongo cat widget on the central display.
+
 config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT # {{{
     bool "Enable widget responsive bongo cat"
     default n
+    help
+      Legacy/common responsive bongo cat flag. Prefer the side-specific
+      CENTRAL/PERIPHERAL flags for new configs.
 
-if NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_IDLE_TIMEOUT_MS
+    int "Responsive bongo cat idle timeout"
+    default 500
+    help
+      Time after the last observed key activity before returning to the idle
+      frame.
 
-# TODO:
+if NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT || NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CENTRAL
 
-endif # NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT }}}
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_VERTICAL
+    bool "Use vertical responsive bongo cat frames"
+    default n
+    help
+      Keep the original rotated responsive bongo cat animation frames.
+
+endif # NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT || NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CENTRAL
+
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_SYNC_CENTRAL
+    bool "Sync responsive bongo cat activity from central to peripheral"
+    depends on ZMK_SPLIT && ZMK_SPLIT_ROLE_CENTRAL
+    default y if NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT || NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_CENTRAL
+    default n
+    help
+      Send a lightweight activity signal from central to peripheral so a
+      peripheral display can react to central key activity. This can be enabled
+      even when the central display does not show the widget.
+
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_SYNC_INTERVAL_MS
+    int "Responsive bongo cat split sync interval"
+    depends on NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_SYNC_CENTRAL
+    default 80
+    help
+      Minimum interval between central-to-peripheral activity sync packets.
+
 endif
 
 ##}}}
@@ -377,6 +648,13 @@ config NICE_OLED_WIDGET_RAW_HID_WEATHER
     Enable the Weather widget, which displays temperature data received
     via RAW HID from the host computer.
 
+config NICE_OLED_WIDGET_RAW_HID_WORLD_CUP
+    bool "nice!OLED World Cup Score Widget"
+    default n
+    help
+    Enable the World Cup score widget, which displays compact score data
+    received via RAW HID from the host computer.
+
 # CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS
 config NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS
     bool "nice!OLED Spotify MacOS Media Player Widget"
@@ -384,6 +662,13 @@ config NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS
     help
     Enable the Media Player widget, which displays song info received
     via RAW HID from the host computer.
+
+config NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX
+    bool "nice!OLED Linux Media Player Widget"
+    default n
+    help
+    Enable the Media Player widget, which displays song info received
+    via RAW HID from the host computer using Linux MPRIS metadata.
 
 
 endif # NICE_OLED_WIDGET_RAW_HID }}}
@@ -515,6 +800,50 @@ config NICE_OLED_WIDGET_CENTRAL
 ### ONLY FOR CENTRAL END }}}
 endif # !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
 ## ANIMATION ON CENTRAL END }}}
+
+### RESPONSIVE WIDGET ON PERIPHERAL START {{{
+if ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+
+config NICE_OLED_WIDGET_RESPONSIVE
+    bool "Enable widget responsive"
+    default n
+
+if NICE_OLED_WIDGET_RESPONSIVE
+
+config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
+    default 4096
+
+config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
+    default 3
+
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_PERIPHERAL
+    bool "Enable responsive bongo cat on peripheral"
+    default n
+    help
+      Show the responsive bongo cat widget on the peripheral display.
+
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT
+    bool "Enable widget responsive bongo cat"
+    default n
+    help
+      Legacy/common responsive bongo cat flag. Prefer the side-specific
+      CENTRAL/PERIPHERAL flags for new configs.
+
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_IDLE_TIMEOUT_MS
+    int "Responsive bongo cat idle timeout"
+    default 500
+
+if NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT || NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_PERIPHERAL
+
+config NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_VERTICAL
+    bool "Use vertical responsive bongo cat frames"
+    default n
+
+endif # NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT || NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT_PERIPHERAL
+endif # NICE_OLED_WIDGET_RESPONSIVE
+endif # ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+### RESPONSIVE WIDGET ON PERIPHERAL END }}}
+
 ### WIDGET POSITION COORDINATES START {{{
 # These variables allow users to customize widget positions.
 # Users can override the defaults by setting the value in their .conf file.
@@ -803,6 +1132,19 @@ config NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_Y
     default 110 if NICE_OLED_ON
     default 110 if NICE_EPAPER_ON
     default 110
+
+# World Cup score submodule
+config NICE_OLED_WIDGET_RAW_HID_WORLD_CUP_CUSTOM_X
+    int "Raw HID World Cup X position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+config NICE_OLED_WIDGET_RAW_HID_WORLD_CUP_CUSTOM_Y
+    int "Raw HID World Cup Y position"
+    default 32 if NICE_OLED_ON
+    default 32 if NICE_EPAPER_ON
+    default 32
 ##}}}
 
 ## RESPONSIVE BONGO CAT WIDGET POSITION {{{
