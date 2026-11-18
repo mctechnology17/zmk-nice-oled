@@ -53,8 +53,9 @@ config ZMK_DISPLAY_BLANK_ON_IDLE
     default y if NICE_CUSTOM_ON
 
 config LV_Z_MEM_POOL_SIZE
-    default 8192 if !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL # dongle_display: 8192 prospector: 10000 def: 4096
-    default 4096 # dongle_display: 8192 prospector: 10000 def: 4096
+    # LVGL 9 needs about twice the pool of LVGL 8 (ZMK doubled it for nice_view: 4096 -> 8192).
+    default 16384 if !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+    default 8192
 
 config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
     int "zmk display dedicated thread stack size"
