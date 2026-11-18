@@ -223,7 +223,7 @@ This document lists the available configuration options for the `nice_oled` shie
 | `CONFIG_ZMK_DISPLAY_STATUS_SCREEN` | choice | `ZMK_DISPLAY_STATUS_SCREEN_CUSTOM` | Status screen type |
 | `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE` | bool | `n` (OLED), `y` (ePaper) | Control display blanking on idle for nice_custom/nice_epaper |
 | `CONFIG_LV_Z_MEM_POOL_SIZE` | int | `8192` | Memory pool size |
-| `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE` | int | `2560` (`3072` with RAW HID) | Display thread stack size |
+| `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE` | int | `8192` (set in the shield `.conf`) | Display thread stack size |
 | `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY` | int | `5` | Display thread priority (lower = higher priority) |
 | `CONFIG_NICE_OLED_WIDGET_STATUS` | bool | - | Custom nice oled status widget (Selects LVGL features) |
 | `CONFIG_NICE_OLED_WIDGET_INVERTED` | bool | `n` | Invert display colors |

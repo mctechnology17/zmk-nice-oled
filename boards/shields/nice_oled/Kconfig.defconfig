@@ -59,8 +59,11 @@ config LV_Z_MEM_POOL_SIZE
 
 config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
     int "zmk display dedicated thread stack size"
-    default 3072 if NICE_OLED_WIDGET_RAW_HID && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
-    default 2560
+    # LVGL 9 draws the canvas through layers and needs more stack than LVGL 8:
+    # 3784 bytes measured on a Corne central with nice!view and raw HID (it had 3072).
+    # ZMK defines this option first, so this default never wins: the value that
+    # applies is the one in nice_oled.conf, nice_epaper.conf and nice_custom.conf.
+    default 8192
 
 config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
     int "zmk display dedicated thread priority"
@@ -483,10 +486,10 @@ config NICE_OLED_WIDGET_RESPONSIVE
 if NICE_OLED_WIDGET_RESPONSIVE
 
 # Override defaults for responsive mode (needs more resources)
-# Stack: def=2560, responsive=4096
+# Stack: 8192 (set in the shield .conf files)
 # Priority: def=5, responsive=3 (higher priority for smoother animations)
 config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
-    default 4096
+    default 8192
 
 config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
     default 3
@@ -812,7 +815,7 @@ config NICE_OLED_WIDGET_RESPONSIVE
 if NICE_OLED_WIDGET_RESPONSIVE
 
 config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
-    default 4096
+    default 8192
 
 config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
     default 3
