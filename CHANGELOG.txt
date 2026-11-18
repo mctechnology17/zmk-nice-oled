@@ -10,6 +10,7 @@ How the versions work:
 # FEATURES NEXT (not released yet)
 =======================================
 # CHANGES
+- [x] README: versions, branches and tags explained
 - [x] CHANGELOG.txt reorganized: one TODO list, v0.0.3 completed, v0.0.1 added
 
 # TODO
