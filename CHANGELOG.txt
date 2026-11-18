@@ -15,7 +15,9 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 - [x] **LVGL 9** canvas drawing goes through layers (`canvas_draw_*` in `widgets/util.c`), the canvas uses the L8 color format and the images use `LV_COLOR_FORMAT_I1`
 - [x] **Output widget** shows the disconnected icon when no output is connected (`ZMK_TRANSPORT_NONE`)
 - [x] Renamed ZMK functions (`zmk_endpoint_get_selected`, layer functions with the new argument) and removed Kconfig options (`LV_USE_IMG` is now `LV_USE_IMAGE`)
-- [ ] Not tested on hardware yet: it builds, the look of every widget still has to be checked on OLED and nice!view
+- [x] **Display thread stack** 8192 bytes, set in the shield `.conf` files: LVGL 9 uses 3784 bytes and the 3072 of ZMK overflowed at boot
+- [x] **LVGL memory pool** doubled: central 16384, peripheral 8192
+- [ ] Tested on a Corne with vikoto and nice!view only; the look of every widget still has to be checked on OLED
 
 # FEATURES NEXT (not released yet, planned as v0.0.3.1 · ZMK v0.3)
 =======================================
