@@ -427,6 +427,7 @@ config NICE_OLED_WIDGET_STREET
     bool "Street character instead of the WPM, modifiers and HID indicator widgets"
     default n
     select ZMK_WPM
+    imply ZMK_HID_INDICATORS
     help
       A character with a cap that takes the place of the WPM widgets (number,
       gauge, graph, Luna, Bongo Cat). It stands still, walks, runs and sprints
