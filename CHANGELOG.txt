@@ -1,6 +1,12 @@
 Changelog file for Structures extra.
 https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
 
+# UNRELEASED
+=======================================
+# FIXES
+- [x] **CONFIG_NICE_OLED_WIDGET_WPM_LUNA_ANIMATION_MS and CONFIG_NICE_OLED_WIDGET_WPM_BONGO_CAT_ANIMATION_MS are now honored** Both were documented in docs/OPTIMIZE.md but the widgets used hardcoded cycle times (200ms walk/run). Luna derives all states from the option (idle at 3x the base), Bongo Cat uses it for the fast state. Effective default changes from 200ms to the Kconfig default of 300ms.
+
+
 # FEATURES v0.0.3 (Jan 09, 2026)
 =======================================
 # NEW FEATURES
