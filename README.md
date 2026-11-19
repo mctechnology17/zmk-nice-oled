@@ -245,7 +245,6 @@ This document lists the available configuration options for the `nice_oled` shie
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY` | bool | `n` | Enable smart battery animation on peripheral |
-| `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WPM` | bool | `n` | Enable PERIPHERAL WPM widget compatibility |
 | `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL` | bool | `y` | Enable animation on peripheral |
 | `CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL` | bool | `y` (if no anim) | Enable static image on peripheral |
 | `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM` | bool | `n` | Enable gem animation on peripheral |
@@ -257,6 +256,60 @@ This document lists the available configuration options for the `nice_oled` shie
 | `CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL_VIM` | bool | `n` | Enable static vim on peripheral |
 | `CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL_VIP_MARCOS` | bool | `n` | Enable static vim_marcos on peripheral |
 | `CONFIG_NICE_OLED_WIDGET_PERIPHERAL` | bool | `n` | Enable test widget on peripheral |
+
+### State of the central on the peripheral screen
+
+The peripheral half can show what happens on the central half: WPM, modifiers,
+Bluetooth profile, layer and the battery of the central. For that you need my
+module [zmk-peripheral-status-sync](https://github.com/mctechnology17/zmk-peripheral-status-sync),
+which sends the state from the central to the peripheral. Without it these
+widgets stay disabled and the rest works as always.
+
+Add it to your `config/west.yml`, with the same branch you use for this module:
+
+```yaml
+    - name: zmk-peripheral-status-sync
+      remote: mctechnology17
+      revision: zmk-v0.4
+```
+
+Then enable what you want. On the central half you choose what is sent, on the
+peripheral half what is kept and drawn:
+
+```
+# central half
+CONFIG_ZMK_WPM=y
+CONFIG_ZMK_PERIPHERAL_STATUS_SYNC_WPM=y
+CONFIG_ZMK_PERIPHERAL_STATUS_SYNC_MODIFIERS=y
+CONFIG_ZMK_PERIPHERAL_STATUS_SYNC_PROFILE=y
+CONFIG_ZMK_PERIPHERAL_STATUS_SYNC_LAYER=y
+CONFIG_ZMK_PERIPHERAL_STATUS_SYNC_CENTRAL_BATTERY=y
+
+# peripheral half
+CONFIG_ZMK_WPM_PERIPHERAL=y
+CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL=y
+CONFIG_ZMK_MODIFIERS_PERIPHERAL=y
+CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS=y
+CONFIG_ZMK_PROFILE_PERIPHERAL=y
+CONFIG_NICE_OLED_WIDGET_PROFILE_PERIPHERAL=y
+CONFIG_ZMK_LAYER_PERIPHERAL=y
+CONFIG_NICE_OLED_WIDGET_LAYER_PERIPHERAL=y
+CONFIG_NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL=y
+```
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL` | bool | `n` | WPM of the central on the peripheral. Needs `CONFIG_ZMK_WPM_PERIPHERAL` |
+| `CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_NUMBER` | bool | `n` | WPM as a number |
+| `CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_LUNA` | bool | `n` | Luna moves with the WPM of the central |
+| `CONFIG_NICE_OLED_WIDGET_WPM_PERIPHERAL_BONGO_CAT` | bool | `n` | Bongo cat moves with the WPM of the central |
+| `CONFIG_NICE_OLED_WIDGET_MODIFIERS_PERIPHERAL_INDICATORS` | bool | `n` | Modifiers of the central on the peripheral |
+| `CONFIG_NICE_OLED_WIDGET_PROFILE_PERIPHERAL` | bool | `n` | Bluetooth profile of the central. Needs `CONFIG_ZMK_PROFILE_PERIPHERAL` |
+| `CONFIG_NICE_OLED_WIDGET_LAYER_PERIPHERAL` | bool | `n` | Active layer of the central. Needs `CONFIG_ZMK_LAYER_PERIPHERAL` |
+| `CONFIG_NICE_OLED_WIDGET_CENTRAL_BATTERY_PERIPHERAL` | bool | `n` | Battery of the central on the peripheral |
+
+All the options of the sender and the receiver are in the README of
+[zmk-peripheral-status-sync](https://github.com/mctechnology17/zmk-peripheral-status-sync).
 
 ## Central Specific
 
