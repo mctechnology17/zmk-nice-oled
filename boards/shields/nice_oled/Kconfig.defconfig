@@ -421,6 +421,21 @@ config NICE_OLED_WIDGET_PERIPHERAL
 ### ANIMATION ON PERIPHERAL END }}}
 ### WIDGET ON CENTRAL START {{{
 if !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+### NICE OLED CAPS WORD {{{
+
+config NICE_OLED_CAPS_WORD
+    bool "The widgets treat caps word like Caps Lock"
+    default y
+    depends on DT_HAS_ZMK_BEHAVIOR_CAPS_WORD_ENABLED
+    help
+      Caps word does not light the Caps Lock indicator, so the widgets read
+      the state of the behavior &caps_word itself. Whatever a widget does
+      with Caps Lock it also does while caps word is active, and it stops
+      when caps word ends, also when it ends by itself with a key that is not
+      in its continue-list: the bat of the street character, and Luna and
+      Bongo Cat of the HID indicators widget. Nothing changes in the keymap.
+
+### NICE OLED CAPS WORD }}}
 ### NICE OLED WIDGET STREET {{{
 
 config NICE_OLED_WIDGET_STREET

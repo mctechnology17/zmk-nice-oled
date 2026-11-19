@@ -5,7 +5,7 @@
  * Author: Marcos Chow Castro
  * Email: mctechnology170318@gmail.com
  * GitHub: https://github.com/mctechnology17
- * Brief: street character widget of zmk-nice-oled: runs with the WPM, fights with the modifiers and takes a bat out with Caps Lock.
+ * Brief: street character widget of zmk-nice-oled: runs with the WPM, fights with the modifiers and takes a bat out with Caps Lock or caps word.
  * =========================================
  * SPDX-License-Identifier: MIT
  */
@@ -28,6 +28,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <dt-bindings/zmk/modifiers.h>
 
+#include "caps_word.h"
 #include "street.h"
 
 #define HID_LED_CAPS_LOCK 0x02
@@ -156,9 +157,10 @@ static struct street_state street_get_state(const zmk_event_t *eh) {
         .wpm = zmk_wpm_get_state(),
         .mods = zmk_hid_get_explicit_mods(),
 #if IS_ENABLED(CONFIG_ZMK_HID_INDICATORS)
-        .caps = (zmk_hid_indicators_get_current_profile() & HID_LED_CAPS_LOCK) != 0,
+        .caps = (zmk_hid_indicators_get_current_profile() & HID_LED_CAPS_LOCK) != 0 ||
+                nice_oled_caps_word_active(),
 #else
-        .caps = false,
+        .caps = nice_oled_caps_word_active(),
 #endif
         .bat = street_bat_from_keymap,
         .action = street_action_from_keymap,
@@ -169,6 +171,10 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_street, struct street_state, street_update_cb
 
 ZMK_SUBSCRIPTION(widget_street, zmk_wpm_state_changed);
 ZMK_SUBSCRIPTION(widget_street, zmk_keycode_state_changed);
+#if IS_ENABLED(CONFIG_NICE_OLED_CAPS_WORD)
+/* The keycode events are already subscribed above: only the position events are missing. */
+ZMK_SUBSCRIPTION(widget_street, zmk_position_state_changed);
+#endif
 #if IS_ENABLED(CONFIG_ZMK_HID_INDICATORS)
 ZMK_SUBSCRIPTION(widget_street, zmk_hid_indicators_changed);
 #endif

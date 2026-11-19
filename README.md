@@ -415,6 +415,28 @@ When using `SYMBOL` style, the following real icons are displayed:
 - Alt: `Alt` text icon
 - Win: Windows logo
 
+## Caps word
+
+Caps word does not light the Caps Lock indicator, so before this the widgets
+could not see it. Now they read the state of `&caps_word` themselves: whatever
+a widget does with Caps Lock it also does while caps word is active, and it
+stops when caps word ends, also when it ends by itself with a key that is not
+in its `continue-list`. You do not have to change your keymap.
+
+| Widget | With Caps Lock or caps word |
+|---|---|
+| Street character | takes the bat out |
+| HID indicators with Luna (`CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA`) | Luna barks |
+| HID indicators with Bongo Cat (`CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT`) | Bongo Cat taps |
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `CONFIG_NICE_OLED_CAPS_WORD` | bool | `y` | The widgets treat caps word like Caps Lock (central half) |
+
+It works on the central half. A widget that wants it needs two lines: read
+`nice_oled_caps_word_active()` and add `NICE_OLED_CAPS_WORD_SUBSCRIPTIONS(...)`
+(see `widgets/caps_word.h`).
+
 ## Street Theme
 
 A character that takes the place of the WPM widgets on the central half, a
@@ -471,16 +493,15 @@ In this order; the first one that applies wins:
 | Trigger | Animation |
 |---------|-----------|
 | A key of your keymap with `&street` (see below) | the one you chose |
-| Caps Lock on, or the bat switched on with `&street` | bat |
+| Caps Lock or caps word on, or the bat switched on with `&street` | bat |
 | GUI | jump |
 | Ctrl | punch |
 | Alt | kick |
 | Shift | uppercut |
 | Typing speed | idle, walk, run, sprint |
 
-Caps Lock is read from the indicator the host sends back. Caps word does not
-light it: use `&street STREET_BAT_ON` and `STREET_BAT_OFF` in the same macro
-that turns caps word on and off.
+Caps Lock is read from the indicator the host sends back. Caps word counts as
+Caps Lock too, see [Caps word](#caps-word).
 
 ### Your own keys: the `&street` behavior
 

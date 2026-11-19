@@ -42,6 +42,7 @@ if(CONFIG_ZMK_DISPLAY AND CONFIG_NICE_OLED_WIDGET_STATUS)
     endif()
     zephyr_library_sources(widgets/output.c)
     zephyr_library_sources(widgets/util.c)
+    zephyr_library_sources_ifdef(CONFIG_NICE_OLED_CAPS_WORD widgets/caps_word.c)
 
     zephyr_library_sources(assets/vim.c)
     if(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE OR CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP)

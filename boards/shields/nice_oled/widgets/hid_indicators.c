@@ -13,6 +13,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/display.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/hid_indicators_changed.h>
+#include <zmk/hid_indicators.h>
 
 #if IS_ENABLED(CONFIG_ZMK_PERIPHERAL_STATUS_SYNC) && IS_ENABLED(CONFIG_ZMK_SPLIT) &&               \
     !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
@@ -20,6 +21,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/peripheral_status_sync.h>
 #endif
 
+#include "caps_word.h"
 #include "hid_indicators.h"
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
@@ -119,15 +121,29 @@ static struct hid_indicators_state hid_indicators_get_state(const zmk_event_t *e
     }
 #endif
 
+#if IS_ENABLED(CONFIG_NICE_OLED_CAPS_WORD)
+    /*
+     * With caps word the widget also wakes up with key events, which carry no indicators: the
+     * current ones are read again and caps word counts as Caps Lock.
+     */
+    uint8_t indicators = ev != NULL ? ev->indicators : zmk_hid_indicators_get_current_profile();
+
+    if (nice_oled_caps_word_active()) {
+        indicators |= LED_CLCK;
+    }
+    return (struct hid_indicators_state){.hid_indicators = indicators};
+#else
     return (struct hid_indicators_state){
         .hid_indicators = ev != NULL ? ev->indicators : 0,
     };
+#endif
 }
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_hid_indicators, struct hid_indicators_state,
                             hid_indicators_update_cb, hid_indicators_get_state)
 
 ZMK_SUBSCRIPTION(widget_hid_indicators, zmk_hid_indicators_changed);
+NICE_OLED_CAPS_WORD_SUBSCRIPTIONS(widget_hid_indicators);
 #if IS_ENABLED(CONFIG_ZMK_PERIPHERAL_STATUS_SYNC) && IS_ENABLED(CONFIG_ZMK_SPLIT) &&               \
     !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
 ZMK_SUBSCRIPTION(widget_hid_indicators, zmk_central_hid_indicators_peripheral_state_changed);

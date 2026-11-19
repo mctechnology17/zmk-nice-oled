@@ -26,6 +26,7 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 - [x] **Sleep art** of the theme: CONFIG_NICE_OLED_SLEEP_ART_STREET
 - [x] **Bluetooth profiles as stars**: CONFIG_NICE_OLED_WIDGET_STREET_STARS
 - [x] **tools/street_assets.py** draws every image of the theme
+- [x] **Caps word** CONFIG_NICE_OLED_CAPS_WORD: the widgets treat caps word like Caps Lock (bat of the street character, Luna and Bongo Cat of the HID indicators), and stop when caps word ends, without changes in the keymap. One helper for every widget: `widgets/caps_word.h`
 - [x] **Street theme** turns `CONFIG_ZMK_HID_INDICATORS` on by itself: without it the bat did not come out with Caps Lock
 - [x] **README** how to show the state of the central on the peripheral screen with the module zmk-peripheral-status-sync (now public)
 - [x] **README** two GIFs of the street theme: every animation of the character (`assets/street_demo.gif`) and the theme on a Corne with two nice!view (`assets/street_keyboard.gif`)
