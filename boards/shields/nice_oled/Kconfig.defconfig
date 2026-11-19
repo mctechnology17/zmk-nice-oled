@@ -58,8 +58,7 @@ config LV_Z_MEM_POOL_SIZE
 
 config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
     int "zmk display dedicated thread stack size"
-    default 3072 if NICE_OLED_WIDGET_RAW_HID && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
-    default 2560
+    default 4096
 
 config ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY
     int "zmk display dedicated thread priority"
@@ -72,7 +71,7 @@ config NICE_OLED_WIDGET_STATUS
     bool "Custom nice oled status widget"
     default y
     select LV_USE_LABEL
-    select LV_USE_IMG
+    select LV_USE_IMAGE
     select LV_USE_CANVAS
     select LV_USE_ANIMIMG
     select LV_USE_ANIMATION
@@ -94,6 +93,10 @@ config NICE_OLED_SHOW_SLEEP_ART_ON_IDLE
 
 config NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP
     bool "whether the sleep art should be shown on idle"
+    default n
+
+config NICE_OLED_SLEEP_STATUS_BOOTLOADER
+    bool "Show bootloader image briefly on wake (sleep status variant)"
     default n
 
 ## ANIMATION ON CENTRAL AND PERIPHERAL END }}}

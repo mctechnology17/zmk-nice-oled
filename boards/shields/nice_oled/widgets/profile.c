@@ -18,10 +18,10 @@ LV_IMG_DECLARE(profile_active);
 
 #if !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_PROFILE_BIG)
 static void draw_inactive_profiles(lv_obj_t *canvas, const struct status_state *state) {
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
 
-    lv_canvas_draw_img(canvas, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_Y, &profiles, &img_dsc);
+    canvas_draw_img(canvas, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_Y, &profiles, &img_dsc);
 }
 
 static void draw_active_profile(lv_obj_t *canvas, const struct status_state *state) {
@@ -30,7 +30,7 @@ static void draw_active_profile(lv_obj_t *canvas, const struct status_state *sta
 
     int offset = state->active_profile_index * 7;
 
-    lv_canvas_draw_rect(canvas, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_X + offset, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_Y, 3, 3, &rect_white_dsc);
+    canvas_draw_rect(canvas, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_X + offset, CONFIG_NICE_OLED_WIDGET_PROFILE_CUSTOM_Y, 3, 3, &rect_white_dsc);
 }
 #endif // !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_PROFILE_BIG)
 
@@ -43,7 +43,7 @@ static void draw_active_profile_text(lv_obj_t *canvas, const struct status_state
     char text[14] = {};
     snprintf(text, sizeof(text), "%d", state->active_profile_index + 1);
 
-    lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_PROFILE_TEXT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_PROFILE_TEXT_CUSTOM_Y, 35, &label_dsc, text);
+    canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_PROFILE_TEXT_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_PROFILE_TEXT_CUSTOM_Y, 35, &label_dsc, text);
 }
 #endif // CONFIG_NICE_EPAPER_ON
 
@@ -53,11 +53,11 @@ void draw_profile_status(lv_obj_t *canvas, const struct status_state *state) {
 #endif // CONFIG_NICE_EPAPER_ON
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_PROFILE_BIG) //  && IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
 
     for (int i = 0; i < 5; i++) {
-        lv_canvas_draw_img(canvas, OFFSET_X + (i * 14), OFFSET_Y,
+        canvas_draw_img(canvas, OFFSET_X + (i * 14), OFFSET_Y,
                            i == state->active_profile_index ? &profile_active : &profile, &img_dsc);
     }
 #else
