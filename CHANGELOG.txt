@@ -35,6 +35,7 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 # FIXES
 - [x] **Raw HID over Bluetooth** the host's leading report ID (0) arrived as the first byte, so time, weather, volume and layout were never shown (only "connected", with 127C and 00:00). hog.c now skips it. Over USB nothing changes
 - [x] Raw HID over Bluetooth tested on a Corne with nice!nano and nice!view: time, weather, layout and volume show (Nov 19, 2026)
+- [x] **README** RAW HID over USB or Bluetooth, and the two udev rule lines Linux needs; the weather widget also works on Linux
 
 # FEATURES NEXT (not released yet, planned as v0.0.3.1 · ZMK v0.3)
 =======================================

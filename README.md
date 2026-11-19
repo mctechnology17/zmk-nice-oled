@@ -751,6 +751,23 @@ This document describes the RAW HID implementation for the nice!OLED, nice!view 
    - remember to customize to your liking.
    - TIP: you can activate seeing the weather and seeing your spotify song on macos!
 
+### USB or Bluetooth
+
+RAW HID works with the central half connected to the computer over USB or over
+Bluetooth (ZMK v0.4, branch `zmk-v0.4`; tested on a Corne with nice!nano). On
+Linux the host needs permission on the `/dev/hidraw*` node of the keyboard. One
+udev rule line is needed for each connection, because over Bluetooth the node
+has no USB vendor/product attributes:
+
+```
+# /etc/udev/rules.d/99-zmk-qmkhidhost.rules
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="615e", MODE:="0666", TAG+="uaccess"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0005:1D50:615E.*", MODE:="0666", TAG+="uaccess"
+```
+
+Then `sudo udevadm control --reload-rules` and reconnect the keyboard (the rule
+only applies to nodes created after it).
+
 ## 1. Introduction to RAW HID
 
 RAW HID provides a flexible way to send and receive custom data between the keyboard and the host computer. This allows for advanced features that are not covered by standard HID profiles.
@@ -782,7 +799,7 @@ CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT_CUSTOM_Y=86
 
 The `LAYOUT_LIST` is a comma-separated list of layout names that will be displayed on the screen based on the index received from the host.
 
-### 2.2. Weather Widget (macOS Only)
+### 2.2. Weather Widget (macOS and Linux)
 
 This widget displays the current temperature received from the host computer.
 
@@ -794,7 +811,7 @@ CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_X=0
 CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_Y=62
 ```
 
-The host application needs to send the temperature value to the keyboard. **This feature is currently optimized for macOS.**
+The host application needs to send the temperature value to the keyboard (tested on macOS and Linux).
 
 ### 2.3. Spotify Media Player Widget (macOS Only)
 
