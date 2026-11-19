@@ -1,4 +1,15 @@
 # nice!oled - nice!epaper - nice!custom
+
+<!-- mc-follow-top:start -->
+<div align="center">
+
+  <a href="https://youtube.com/@mctechnology17"><img align="center" alt="MC Technology | YouTube" width="22px" src="https://github.com/mctechnology17/mctechnology17/blob/main/src/youtube.png" /></a>
+  <a href="https://www.instagram.com/mctechnology17/"><img align="center" alt="MC Technology | Instagram" width="22px" src="https://github.com/mctechnology17/mctechnology17/blob/main/src/instagram.png" /></a>
+  <a href="https://www.facebook.com/mctechnology17/"><img align="center" alt="MC Technology | Facebook" width="22px" src="https://github.com/mctechnology17/mctechnology17/blob/main/src/facebook.png" /></a>
+  <a href="https://www.tiktok.com/@mctechnology17"><img align="center" alt="MC Technology | TikTok" width="22px" src="https://github.com/mctechnology17/mctechnology17/blob/main/src/tiktok.png" /></a>
+
+</div>
+<!-- mc-follow-top:end -->
 ![nice_oled_demo](./assets/nice_oled_demo.GIF)
 ![nice_epaper_demo](./assets/nice_epaper_demo.GIF)
 ![nice_epaper_demo](./assets/nice_custom_demo.GIF)
@@ -955,9 +966,20 @@ This project is built upon the foundation of numerous innovative contributions f
 
 Your contributions have been instrumental in making this modular shield system possible. Thank you for open-sourcing your work and driving the ZMK ecosystem forward.
 
-# If you like my contributions, please don't forget the following:
+<!-- mc-follow:start -->
+# Support this project
 
-I appreciate if you follow me on [<img align="center" alt="GitHub" width="22px" src="https://github.com/mctechnology17/mctechnology17/blob/main/src/github.png" />][github] and [<img align="center" alt="YouTube" width="22px" src="https://github.com/mctechnology17/mctechnology17/blob/main/src/youtube.png" />][youtube] !
+This is a personal project that I build in my free time. If it is useful to
+you, the best way to help is to follow and subscribe:
+
+[YouTube](https://youtube.com/@mctechnology17) · [Instagram](https://www.instagram.com/mctechnology17/) · [Facebook](https://www.facebook.com/mctechnology17/) · [TikTok](https://www.tiktok.com/@mctechnology17)
+
+I make videos about split keyboards, ZMK and open source (in Spanish, long
+videos with English subtitles). Every follow and every subscription helps me a
+lot and keeps me motivated to bring more to the open source community.
+
+Thank you for every report and every issue: they make these projects better.
+<!-- mc-follow:end -->
 
 ![Star](./assets/star.GIF)
 
