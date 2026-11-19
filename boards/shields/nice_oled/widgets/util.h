@@ -49,8 +49,15 @@ struct status_state {
     uint8_t volume;
     uint8_t layout;
     int8_t temperature;
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
-    char media_player[11];
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS) || \
+    IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
+    char media_player[33];
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
+    char media_artist[26];        // artist from 0xB1 (up to 25 bytes + null)
+    uint8_t media_play_status;    // 0=stopped, 1=playing, 2=paused
+    uint16_t media_total_time;    // seconds
+    uint16_t media_position_snap; // position at last extended event, seconds
 #endif
 #endif
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED)

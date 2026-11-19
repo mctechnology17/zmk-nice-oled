@@ -13,6 +13,10 @@ ZMK_EVENT_IMPL(weather_notification); // NUEVO
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
 ZMK_EVENT_IMPL(spotify_notification);
 #endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
+ZMK_EVENT_IMPL(media_player_linux_notification);
+ZMK_EVENT_IMPL(media_extended_notification);
+#endif
 #ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT
 ZMK_EVENT_IMPL(layout_notification);
 #endif
@@ -24,6 +28,11 @@ typedef enum {
     _WEATHER = 0xAF, // NUEVO
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
     _SPOTIFY = 0xAE,
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
+    _MEDIA_TITLE = 0xAD,
+    _MEDIA_PLAYER_LINUX = 0xB0,
+    _MEDIA_EXTENDED = 0xB1,
 #endif
 } hid_data_type;
 
@@ -96,6 +105,39 @@ static void process_raw_hid_data(uint8_t *data) {
         memcpy(notification.media_player, &data[1], sizeof(notification.media_player));
         notification.media_player[sizeof(notification.media_player) - 1] = '\0';
         raise_spotify_notification(notification);
+        break;
+    }
+#endif
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_LINUX)
+    case _MEDIA_TITLE: {
+        struct media_player_linux_notification notification = {0};
+        uint8_t title_len = MIN(data[1], MIN(sizeof(notification.media_player) - 1,
+                                             CONFIG_NICE_OLED_WIDGET_RAW_HID_REPORT_SIZE - 2));
+        memcpy(notification.media_player, &data[2], title_len);
+        notification.media_player[title_len] = '\0';
+        raise_media_player_linux_notification(notification);
+        break;
+    }
+    case _MEDIA_PLAYER_LINUX: {
+        struct media_player_linux_notification notification = {0};
+        uint8_t player_len = MIN(sizeof(notification.media_player) - 1,
+                                 CONFIG_NICE_OLED_WIDGET_RAW_HID_REPORT_SIZE - 1);
+        memcpy(notification.media_player, &data[1], player_len);
+        notification.media_player[player_len] = '\0';
+        raise_media_player_linux_notification(notification);
+        break;
+    }
+    case _MEDIA_EXTENDED: {
+        struct media_extended_notification notification = {0};
+        notification.total_time  = (uint16_t)data[1] | ((uint16_t)data[2] << 8);
+        notification.position    = (uint16_t)data[3] | ((uint16_t)data[4] << 8);
+        notification.play_status = data[5];
+        uint8_t avail = (CONFIG_NICE_OLED_WIDGET_RAW_HID_REPORT_SIZE > 7)
+                        ? (uint8_t)(CONFIG_NICE_OLED_WIDGET_RAW_HID_REPORT_SIZE - 7) : 0;
+        uint8_t artist_len = MIN(data[6], MIN(25u, avail));
+        memcpy(notification.artist, &data[7], artist_len);
+        notification.artist[artist_len] = '\0';
+        raise_media_extended_notification(notification);
         break;
     }
 #endif
