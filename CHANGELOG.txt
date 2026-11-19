@@ -1,6 +1,12 @@
 Changelog file for Structures extra.
 https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
 
+# UNRELEASED
+=======================================
+# FIXES
+- [x] **Full-canvas WPM redraw skipped when no WPM visual is on the canvas** With WPM_NUMBER, WPM_SPEEDOMETER and WPM_GRAPH disabled (e.g. Luna or Bongo Cat only), the screen no longer redraws and rotates the whole canvas on every WPM tick; the animations update only their own area. Lower CPU load and better typing latency on the central side.
+
+
 # FEATURES v0.0.3 (Jan 09, 2026)
 =======================================
 # NEW FEATURES

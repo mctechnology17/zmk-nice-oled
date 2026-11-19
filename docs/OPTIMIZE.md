@@ -129,6 +129,22 @@ Options:
 
 ## Animation Optimization
 
+### Luna / Bongo Cat without the WPM counter
+
+Luna and Bongo Cat need the WPM *subsystem* (it drives their idle/walk/run
+states) but not the on-canvas WPM *visuals*. When `WPM_NUMBER`,
+`WPM_SPEEDOMETER`, and `WPM_GRAPH` are all disabled, the module skips the
+full-canvas redraw that used to run on every WPM tick — only the small
+animation area is updated. So the cheapest Luna setup is:
+
+```ini
+CONFIG_NICE_OLED_WIDGET_WPM=y
+CONFIG_NICE_OLED_WIDGET_WPM_LUNA=y
+CONFIG_NICE_OLED_WIDGET_WPM_NUMBER=n
+CONFIG_NICE_OLED_WIDGET_WPM_SPEEDOMETER=n
+CONFIG_NICE_OLED_WIDGET_WPM_GRAPH=n
+```
+
 ### Animation Duration
 
 Longer durations = less CPU usage, smoother appearance.
