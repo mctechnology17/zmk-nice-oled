@@ -1,6 +1,12 @@
 Changelog file for Structures extra.
 https://github.com/mctechnology17/zmk-nice-oled/blob/main/CHANGELOG.txt
 
+# UNRELEASED
+=======================================
+# NEW FEATURES
+- [x] **External widget hook** CONFIG_NICE_OLED_EXTERNAL_WIDGET added: when enabled, the peripheral screen init calls nice_oled_external_widget_init(parent), provided by another Zephyr module. Lets separate modules (e.g. animation libraries) draw on the peripheral screen without forking this repo. Off by default, zero cost when disabled.
+
+
 # FEATURES v0.0.3 (Jan 09, 2026)
 =======================================
 # NEW FEATURES
