@@ -1,0 +1,22 @@
+# ========================================
+# FileName: zmk-nice-oled,behavior-street.yaml
+# Date: 19.November.2026
+# Author: Marcos Chow Castro
+# Email: mctechnology170318@gmail.com
+# GitHub: https://github.com/mctechnology17
+# Brief: binding of the behavior &street, which triggers the animations of the street character of zmk-nice-oled from the keymap.
+# =========================================
+# SPDX-License-Identifier: MIT
+
+description: |
+  Triggers an animation of the street character from the keymap, on any key,
+  layer or macro. The parameter is one of the STREET_* values of
+  <behaviors/street.dtsi>: an action that lasts while the key is held
+  (STREET_JUMP, STREET_PUNCH, STREET_KICK, STREET_UPPER, STREET_BAT) or a
+  switch for the bat (STREET_BAT_ON, STREET_BAT_OFF, STREET_BAT_TOG).
+
+compatible: "zmk-nice-oled,behavior-street"
+
+include: one_param.yaml
+
+# vim: set ft=yaml fdm=marker:

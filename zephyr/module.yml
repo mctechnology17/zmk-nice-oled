@@ -2,3 +2,4 @@ name: "nice!oled"
 build:
   settings:
     board_root: .
+    dts_root: .

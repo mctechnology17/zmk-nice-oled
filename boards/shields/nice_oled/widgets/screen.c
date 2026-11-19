@@ -220,6 +220,15 @@ static struct zmk_widget_sleep_status sleep_status_widget;
 #endif
 
 /**
+ * street character
+ **/
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_STREET)
+#include "street.h"
+static struct zmk_widget_street street_widget;
+#endif
+
+/**
  * luna
  **/
 
@@ -1196,6 +1205,12 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_POINTER_STATUS)
     widget_pointer_status_init();
+#endif
+
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_STREET)
+    zmk_widget_street_init(&street_widget, canvas);
+    lv_obj_align(zmk_widget_street_obj(&street_widget), LV_ALIGN_TOP_LEFT,
+                 CONFIG_NICE_OLED_WIDGET_STREET_CUSTOM_X, CONFIG_NICE_OLED_WIDGET_STREET_CUSTOM_Y);
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)

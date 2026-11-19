@@ -20,6 +20,10 @@ static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 LV_IMG_DECLARE(vim_32x128);
 LV_IMG_DECLARE(vim_68x160);
 LV_IMG_DECLARE(sleep_oled);
+#if IS_ENABLED(CONFIG_NICE_OLED_SLEEP_ART_STREET)
+LV_IMG_DECLARE(street_sleep_68x160);
+LV_IMG_DECLARE(street_sleep_32x128);
+#endif
 
 static void set_sleep_img(struct zmk_widget_sleep_status *widget,
                           struct zmk_activity_state_changed ev) {
@@ -69,7 +73,11 @@ int zmk_widget_sleep_status_init(struct zmk_widget_sleep_status *widget, lv_obj_
     widget->obj = lv_obj_create(parent);
     lv_obj_set_size(widget->obj, 160, 68);
     widget->art = lv_img_create(widget->obj);
-#if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
+#if IS_ENABLED(CONFIG_NICE_OLED_SLEEP_ART_STREET) && IS_ENABLED(CONFIG_NICE_EPAPER_ON)
+    lv_img_set_src(widget->art, &street_sleep_68x160);
+#elif IS_ENABLED(CONFIG_NICE_OLED_SLEEP_ART_STREET)
+    lv_img_set_src(widget->art, &street_sleep_32x128);
+#elif IS_ENABLED(CONFIG_NICE_EPAPER_ON)
     lv_img_set_src(widget->art, &vim_68x160);
 #else
     // lv_img_set_src(widget->art, &sleep_oled);

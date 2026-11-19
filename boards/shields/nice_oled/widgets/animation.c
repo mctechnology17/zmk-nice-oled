@@ -27,7 +27,30 @@ const lv_img_dsc_t *crystal_imgs[] = {
 };
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL)
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE)
+LV_IMG_DECLARE(street_chase_00);
+LV_IMG_DECLARE(street_chase_01);
+LV_IMG_DECLARE(street_chase_02);
+LV_IMG_DECLARE(street_chase_03);
+LV_IMG_DECLARE(street_chase_04);
+LV_IMG_DECLARE(street_chase_05);
+LV_IMG_DECLARE(street_chase_06);
+LV_IMG_DECLARE(street_chase_07);
+LV_IMG_DECLARE(street_chase_08);
+LV_IMG_DECLARE(street_chase_09);
+LV_IMG_DECLARE(street_chase_10);
+LV_IMG_DECLARE(street_chase_11);
+LV_IMG_DECLARE(street_chase_12);
+LV_IMG_DECLARE(street_chase_13);
+LV_IMG_DECLARE(street_chase_14);
+LV_IMG_DECLARE(street_chase_15);
+const lv_img_dsc_t *street_chase_imgs[] = {
+    &street_chase_00, &street_chase_01, &street_chase_02, &street_chase_03,
+    &street_chase_04, &street_chase_05, &street_chase_06, &street_chase_07,
+    &street_chase_08, &street_chase_09, &street_chase_10, &street_chase_11,
+    &street_chase_12, &street_chase_13, &street_chase_14, &street_chase_15,
+};
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
 
 LV_IMG_DECLARE(head_00);
 LV_IMG_DECLARE(head_01);
@@ -178,7 +201,9 @@ void draw_animation(lv_obj_t *canvas, struct zmk_widget_screen *widget) {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL)
     lv_obj_center(art);
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE)
+    lv_animimg_set_src(art, (const void **)street_chase_imgs, 16);
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
     lv_animimg_set_src(art, (const void **)head_imgs, 16);
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT)
     lv_animimg_set_src(art, (const void **)cat_imgs, 8);

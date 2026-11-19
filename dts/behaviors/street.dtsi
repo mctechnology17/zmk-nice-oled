@@ -1,0 +1,51 @@
+/*
+ * ========================================
+ * FileName: street.dtsi
+ * Date: 19.November.2026
+ * Author: Marcos Chow Castro
+ * Email: mctechnology170318@gmail.com
+ * GitHub: https://github.com/mctechnology17
+ * Brief: behavior &street of zmk-nice-oled: triggers the animations of the street character from the keymap.
+ * =========================================
+ * SPDX-License-Identifier: MIT
+ *
+ * Use in a keymap:
+ *
+ *   #include <behaviors/street.dtsi>
+ *   ...
+ *   &street STREET_JUMP       // jumps while the key is held
+ *   &street STREET_BAT_TOG    // takes the bat out, or puts it away
+ *
+ * A keymap shared with builds that do not load zmk-nice-oled can guard it:
+ *
+ *   #if __has_include(<behaviors/street.dtsi>)
+ *   #include <behaviors/street.dtsi>
+ *   #endif
+ *   #ifdef STREET_JUMP
+ *   ... &street STREET_JUMP ...
+ *   #endif
+ */
+
+/* Switches for the bat: they stay until the next one. */
+#define STREET_BAT_OFF 0
+#define STREET_BAT_ON 1
+#define STREET_BAT_TOG 2
+
+/* Actions: they last while the key is held. */
+#define STREET_JUMP 10
+#define STREET_PUNCH 11
+#define STREET_KICK 12
+#define STREET_UPPER 13
+#define STREET_BAT 14
+
+/ {
+    behaviors {
+        /omit-if-no-ref/ street: street {
+            compatible = "zmk-nice-oled,behavior-street";
+            #binding-cells = <1>;
+            display-name = "Street character";
+        };
+    };
+};
+
+/* vim: set ft=dts fdm=marker: */

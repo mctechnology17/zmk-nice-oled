@@ -47,6 +47,7 @@ if(CONFIG_ZMK_DISPLAY AND CONFIG_NICE_OLED_WIDGET_STATUS)
     if(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE OR CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP)
       zephyr_library_sources(assets/sleep_status_art.c)
       zephyr_library_sources(widgets/sleep_status.c)
+      target_sources_ifdef(CONFIG_NICE_OLED_SLEEP_ART_STREET app PRIVATE assets/street_sleep_art.c)
     endif()
 
     zephyr_library_sources(assets/luna_images.c)
@@ -54,6 +55,13 @@ if(CONFIG_ZMK_DISPLAY AND CONFIG_NICE_OLED_WIDGET_STATUS)
 
 
     if(NOT CONFIG_ZMK_SPLIT OR CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+
+      # The behavior &street is built whenever a keymap uses it, also without the character.
+      target_sources_ifdef(CONFIG_DT_HAS_ZMK_NICE_OLED_BEHAVIOR_STREET_ENABLED app PRIVATE widgets/behavior_street.c)
+      if(CONFIG_NICE_OLED_WIDGET_STREET)
+        target_sources(app PRIVATE widgets/street.c assets/street_images.c)
+        target_sources_ifdef(CONFIG_NICE_OLED_WIDGET_STREET_STARS app PRIVATE assets/street_stars.c)
+      endif()
 
       if(CONFIG_NICE_OLED_WIDGET_WPM)
         zephyr_library_sources(widgets/wpm.c)
@@ -133,6 +141,7 @@ if(CONFIG_ZMK_DISPLAY AND CONFIG_NICE_OLED_WIDGET_STATUS)
       if(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON OR CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_POKEMON)
         target_sources(app PRIVATE assets/pokemon.c)
       endif()
+      target_sources_ifdef(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE app PRIVATE assets/street_chase.c)
       zephyr_library_sources(widgets/animation.c)
       zephyr_library_sources(widgets/screen_peripheral.c)
     endif()

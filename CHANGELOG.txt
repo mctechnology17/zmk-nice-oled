@@ -19,6 +19,15 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 - [x] **LVGL memory pool** doubled: central 16384, peripheral 8192
 - [ ] Tested on a Corne with vikoto and nice!view only; the look of every widget still has to be checked on OLED
 
+# NEW FEATURES
+- [x] **Street theme** CONFIG_NICE_OLED_WIDGET_STREET: a character instead of the WPM widgets. It stands, walks, runs and sprints with the typing speed, jumps with GUI, punches with Ctrl, kicks with Alt, throws an uppercut with Shift and takes a bat out with Caps Lock. 68x90 on a nice!view, 32x24 on an OLED
+- [x] **Behavior &street** (`#include <behaviors/street.dtsi>`): any animation of the character on any key, layer or macro, and switches for the bat (for caps word, which does not light the Caps Lock indicator)
+- [x] **Car chase** on the peripheral half: CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE
+- [x] **Sleep art** of the theme: CONFIG_NICE_OLED_SLEEP_ART_STREET
+- [x] **Bluetooth profiles as stars**: CONFIG_NICE_OLED_WIDGET_STREET_STARS
+- [x] **tools/street_assets.py** draws every image of the theme
+- [ ] Street theme: the small character and the sleep art for OLED are not tested on a display; the bat animation still needs its own four poses
+
 # FEATURES NEXT (not released yet, planned as v0.0.3.1 · ZMK v0.3)
 =======================================
 # NEW FEATURES

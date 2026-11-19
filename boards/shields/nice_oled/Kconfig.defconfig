@@ -100,6 +100,12 @@ config NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP
     bool "whether the sleep art should be shown on idle"
     default n
 
+config NICE_OLED_SLEEP_ART_STREET
+    bool "Sleep art of the street theme (cover made of comic panels)"
+    default y if NICE_OLED_WIDGET_STREET
+    default y if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE
+    default n
+
 ## ANIMATION ON CENTRAL AND PERIPHERAL END }}}
 ### WIDGET ON PERIPHERAL START {{{
 ### SMART_BATTERY {{{
@@ -372,8 +378,16 @@ config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN
     bool "Enable spaceman animation on peripheral"
     default n
 
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE
+    bool "Enable car chase animation on peripheral (street theme)"
+    default n
+    help
+      A getaway car and a police car on a scrolling road, seen from above.
+      It wins over the other peripheral animations when several are enabled.
+
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS
     int "Animation length in milliseconds"
+    default 2400 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE
     default 10000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_POKEMON
     default 10000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON
     default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_HEAD
@@ -407,10 +421,90 @@ config NICE_OLED_WIDGET_PERIPHERAL
 ### ANIMATION ON PERIPHERAL END }}}
 ### WIDGET ON CENTRAL START {{{
 if !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+### NICE OLED WIDGET STREET {{{
+
+config NICE_OLED_WIDGET_STREET
+    bool "Street character instead of the WPM, modifiers and HID indicator widgets"
+    default n
+    select ZMK_WPM
+    help
+      A character with a cap that takes the place of the WPM widgets (number,
+      gauge, graph, Luna, Bongo Cat). It stands still, walks, runs and sprints
+      with the typing speed, jumps with GUI, punches with Ctrl, kicks with
+      Alt, throws an uppercut with Shift and takes a bat out with Caps Lock.
+      The WPM, modifiers and HID indicator widgets are off by default with it,
+      because they use the same place on the screen.
+
+if NICE_OLED_WIDGET_STREET
+
+config NICE_OLED_WIDGET_STREET_SMALL
+    bool "Small character (32x24, for a 32 pixel wide OLED)"
+    default y if NICE_OLED_ON
+    default n
+    help
+      The big character is 68x90 and needs a nice!view or a display of that size.
+
+config NICE_OLED_WIDGET_STREET_LIGHT_ON_DARK
+    bool "The display shows light pixels on a dark background"
+    default y if NICE_OLED_ON
+    default n
+    help
+      The big character has two drawings, so that the skin and the shoes are
+      always light and the trousers and the cap always dark. Enable this when
+      your display shows light pixels on a dark background (an OLED, or a
+      nice!view that looks white on black); leave it off when it shows dark
+      pixels on a light background. If the face and the arms of the character
+      look dark with a light outline, this option has the wrong value.
+
+config NICE_OLED_WIDGET_STREET_MODIFIERS
+    bool "The character reacts to the modifiers"
+    default y
+    help
+      GUI jumps, Ctrl punches, Alt kicks and Shift throws an uppercut. Turn it
+      off to trigger the animations only from your own keys with the behavior
+      &street of <behaviors/street.dtsi>.
+
+config NICE_OLED_WIDGET_STREET_WPM_WALK
+    int "WPM from which the character walks"
+    default 15
+
+config NICE_OLED_WIDGET_STREET_WPM_RUN
+    int "WPM from which the character runs"
+    default 35
+
+config NICE_OLED_WIDGET_STREET_WPM_SPRINT
+    int "WPM from which the character sprints"
+    default 70
+
+config NICE_OLED_WIDGET_STREET_STARS
+    bool "Show the Bluetooth profiles as stars"
+    default y if NICE_EPAPER_ON
+    default y if NICE_CUSTOM_ON
+    default n
+    depends on NICE_OLED_WIDGET_PROFILE_BIG
+    help
+      One star per Bluetooth profile (up to 5). The star of the active
+      profile is filled, the others are outlines.
+
+config NICE_OLED_WIDGET_STREET_CUSTOM_X
+    int "Street character X position"
+    default 65 if NICE_OLED_ON
+    default 33 if NICE_EPAPER_ON
+    default 33
+
+config NICE_OLED_WIDGET_STREET_CUSTOM_Y
+    int "Street character Y position"
+    default 0 if NICE_OLED_ON
+    default 0 if NICE_EPAPER_ON
+    default 0
+
+endif # NICE_OLED_WIDGET_STREET
+# }}}
 ### NICE OLED WIDGET WPM {{{
 
 config NICE_OLED_WIDGET_WPM
     bool "Enable Nice OLED WPM Widget"
+    default n if NICE_OLED_WIDGET_STREET
     default y
 
 if NICE_OLED_WIDGET_WPM
@@ -547,6 +641,7 @@ endif
 ### NICE OLED WIDGET HID INDICATORS {{{
 config NICE_OLED_WIDGET_HID_INDICATORS
     bool "Enable HID indicators"
+    default n if NICE_OLED_WIDGET_STREET
     default y
 
 if NICE_OLED_WIDGET_HID_INDICATORS
@@ -679,6 +774,7 @@ endif # NICE_OLED_WIDGET_RAW_HID }}}
 ### NICE OLED WIDGET MODIFIERS INDICATORS {{{
 config NICE_OLED_WIDGET_MODIFIERS_INDICATORS
     bool "Enable modifiers indicators"
+    default n if NICE_OLED_WIDGET_STREET
     default y
 
 if NICE_OLED_WIDGET_MODIFIERS_INDICATORS
