@@ -91,6 +91,7 @@ The companion host application, `zmk-hid-host`, provides the necessary data brid
   <img align="center" alt="demo4" width="400px" src="./assets/demo4.jpg" />
   <img align="center" alt="Animation Preview" width="400px" src="./assets/animation.gif" />
   <img align="center" alt="preview1" width="400px" src="./assets/preview1.JPG" />
+  <img align="center" alt="Street theme" width="400px" src="./assets/street_keyboard.gif" />
 
 </div>
 
@@ -347,6 +348,17 @@ When using `SYMBOL` style, the following real icons are displayed:
 A character that takes the place of the WPM widgets on the central half, a
 car chase for the peripheral half, a sleep art and the Bluetooth profiles
 drawn as stars. Made for ZMK on Zephyr 4.1 (LVGL 9), branch `zmk-v0.4`.
+
+<p align="center">
+  <img align="center" alt="Street theme: all the animations of the character and the car chase" width="640px" src="./assets/street_demo.gif" />
+</p>
+
+And this is how it looks on a real keyboard (Corne with two nice!view, the
+character on the left half and the chase on the right half):
+
+<p align="center">
+  <img align="center" alt="Street theme on a Corne with two nice!view" width="480px" src="./assets/street_keyboard.gif" />
+</p>
 
 The character stands still, walks, runs and sprints with your typing speed,
 jumps, punches, kicks, throws an uppercut and takes a bat out. It is 68x90 on

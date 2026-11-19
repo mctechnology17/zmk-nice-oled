@@ -26,6 +26,7 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 - [x] **Sleep art** of the theme: CONFIG_NICE_OLED_SLEEP_ART_STREET
 - [x] **Bluetooth profiles as stars**: CONFIG_NICE_OLED_WIDGET_STREET_STARS
 - [x] **tools/street_assets.py** draws every image of the theme
+- [x] **README** two GIFs of the street theme: every animation of the character (`assets/street_demo.gif`) and the theme on a Corne with two nice!view (`assets/street_keyboard.gif`)
 - [ ] Street theme: the small character and the sleep art for OLED are not tested on a display; the bat animation still needs its own four poses
 
 # FEATURES NEXT (not released yet, planned as v0.0.3.1 · ZMK v0.3)
