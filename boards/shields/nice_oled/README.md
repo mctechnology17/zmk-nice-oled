@@ -1,1 +1,0 @@
-/Users/marcos/zmk-privat/my_zmk/zmk-nice-oled/README.md
