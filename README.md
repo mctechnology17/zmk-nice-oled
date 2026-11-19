@@ -10,6 +10,7 @@
 
 </div>
 <!-- mc-follow-top:end -->
+
 ![nice_oled_demo](./assets/nice_oled_demo.GIF)
 ![nice_epaper_demo](./assets/nice_epaper_demo.GIF)
 ![nice_epaper_demo](./assets/nice_custom_demo.GIF)
@@ -966,6 +967,8 @@ This project is built upon the foundation of numerous innovative contributions f
 
 Your contributions have been instrumental in making this modular shield system possible. Thank you for open-sourcing your work and driving the ZMK ecosystem forward.
 
+![Star](./assets/star.GIF)
+
 <!-- mc-follow:start -->
 # Support this project
 
@@ -980,8 +983,6 @@ lot and keeps me motivated to bring more to the open source community.
 
 Thank you for every report and every issue: they make these projects better.
 <!-- mc-follow:end -->
-
-![Star](./assets/star.GIF)
 
 # My other projects:
 - [zmk-dongle-display-view]: Use your [niceview] vertical with very beautiful widgets
