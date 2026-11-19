@@ -36,7 +36,8 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 - [x] **Smart battery uses the chosen peripheral animation** (issue #31): with CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY=y the peripheral always showed the gem. Now it follows CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_<NAME>; the options ..._SMART_BATTERY_<NAME> still override it. Thanks @plandevida for the report (#31), @NurgisaA for finding the cause and @chalukyaj for the idea of reusing the animation options (from his LVGL 9 port)
 - [x] **Peripheral animation choice** the default cat no longer wins over another chosen animation (setting ..._PERIPHERAL_SPACEMAN=y showed the cat unless ..._PERIPHERAL_CAT=n), and an explicit GEM wins over the rest, also for the animation length
 - [x] **README** how to choose the peripheral animation, with and without smart battery
-- [ ] Tested only by building; check on a display
+- [x] Tested on a Corne with nice!nano and nice!view (smart battery + spaceman on the peripheral): the chosen animation shows (Nov 19, 2026)
+- [ ] The animation stops for a moment and then moves again: find out whether it comes from the smart battery or happens with every peripheral animation
 
 # BREAKING CHANGES
 - [x] Smart battery without any chosen animation now shows the cat (the default peripheral animation) instead of the gem. To keep the gem: CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_GEM=y
