@@ -265,7 +265,8 @@ This document lists the available configuration options for the `nice_oled` shie
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY` | bool | `n` | Enable smart battery animation on peripheral |
+| `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY` | bool | `n` | The peripheral animation plays only while charging (first frame otherwise) |
+| `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_<NAME>` | bool | follows `..._PERIPHERAL_<NAME>` | Override the smart battery animation: `GEM`, `CAT`, `HEAD`, `POKEMON` or `SPACEMAN` |
 | `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL` | bool | `y` | Enable animation on peripheral |
 | `CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL` | bool | `y` (if no anim) | Enable static image on peripheral |
 | `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM` | bool | `n` | Enable gem animation on peripheral |
@@ -277,6 +278,18 @@ This document lists the available configuration options for the `nice_oled` shie
 | `CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL_VIM` | bool | `n` | Enable static vim on peripheral |
 | `CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL_VIP_MARCOS` | bool | `n` | Enable static vim_marcos on peripheral |
 | `CONFIG_NICE_OLED_WIDGET_PERIPHERAL` | bool | `n` | Enable test widget on peripheral |
+
+Choosing the peripheral animation: enable one `..._PERIPHERAL_<NAME>` option.
+The cat is the default, so any other choice wins over it without setting
+`..._PERIPHERAL_CAT=n`, and an explicit `GEM` wins over the rest. The street
+car chase wins over all of them (it is not available with smart battery). With
+`..._SMART_BATTERY=y` the same animation plays only while the battery is
+charging:
+
+```ini
+CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY=y
+CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN=y
+```
 
 ### State of the central on the peripheral screen
 

@@ -32,6 +32,15 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 - [x] **README** two GIFs of the street theme: every animation of the character (`assets/street_demo.gif`) and the theme on a Corne with two nice!view (`assets/street_keyboard.gif`)
 - [ ] Street theme: the small character and the sleep art for OLED are not tested on a display; the bat animation still needs its own four poses
 
+# FIXES
+- [x] **Smart battery uses the chosen peripheral animation** (issue #31): with CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY=y the peripheral always showed the gem. Now it follows CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_<NAME>; the options ..._SMART_BATTERY_<NAME> still override it
+- [x] **Peripheral animation choice** the default cat no longer wins over another chosen animation (setting ..._PERIPHERAL_SPACEMAN=y showed the cat unless ..._PERIPHERAL_CAT=n), and an explicit GEM wins over the rest, also for the animation length
+- [x] **README** how to choose the peripheral animation, with and without smart battery
+- [ ] Tested only by building; check on a display
+
+# BREAKING CHANGES
+- [x] Smart battery without any chosen animation now shows the cat (the default peripheral animation) instead of the gem. To keep the gem: CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_GEM=y
+
 # FEATURES NEXT (not released yet, planned as v0.0.3.1 · ZMK v0.3)
 =======================================
 # NEW FEATURES
