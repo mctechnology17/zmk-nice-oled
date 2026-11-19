@@ -76,7 +76,16 @@ static ssize_t write_hids_raw_hid_report(struct bt_conn *conn, const struct bt_g
     uint8_t *data = (uint8_t *)buf;
     LOG_INF("BT - Received Raw HID report of length %i", len);
     LOG_HEXDUMP_DBG(data, len, "BT - Received Raw HID report");
-    raise_raw_hid_received_event((struct raw_hid_received_event){.data = data, .length = len});
+
+    // The host writes the report with a leading report ID (0, hidapi needs it). Over USB the
+    // kernel removes it; over Bluetooth (BlueZ, uhid) it arrives as the first byte, so the
+    // message type would be read as 0 and nothing but "connected" would be shown.
+    uint16_t data_len = len;
+    if (data_len == CONFIG_NICE_OLED_WIDGET_RAW_HID_REPORT_SIZE + 1 && data[0] == 0x00) {
+        data++;
+        data_len--;
+    }
+    raise_raw_hid_received_event((struct raw_hid_received_event){.data = data, .length = data_len});
 
     return len;
 }

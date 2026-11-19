@@ -32,6 +32,10 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 - [x] **README** two GIFs of the street theme: every animation of the character (`assets/street_demo.gif`) and the theme on a Corne with two nice!view (`assets/street_keyboard.gif`)
 - [ ] Street theme: the small character and the sleep art for OLED are not tested on a display; the bat animation still needs its own four poses
 
+# FIXES
+- [x] **Raw HID over Bluetooth** the host's leading report ID (0) arrived as the first byte, so time, weather, volume and layout were never shown (only "connected", with 127C and 00:00). hog.c now skips it. Over USB nothing changes
+- [x] Raw HID over Bluetooth tested on a Corne with nice!nano and nice!view: time, weather, layout and volume show (Nov 19, 2026)
+
 # FEATURES NEXT (not released yet, planned as v0.0.3.1 · ZMK v0.3)
 =======================================
 # NEW FEATURES
