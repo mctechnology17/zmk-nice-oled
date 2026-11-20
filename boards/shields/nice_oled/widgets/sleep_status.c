@@ -25,6 +25,11 @@ LV_IMG_DECLARE(street_sleep_68x160);
 LV_IMG_DECLARE(street_sleep_32x128);
 #endif
 
+// With CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=y ZMK stops the display updates when the keyboard goes
+// idle or to sleep. The art is shown at that same moment, so it is drawn right away: waiting for
+// the next display tick would leave the screen as it was, or half drawn.
+static void show_art_now(void) { lv_refr_now(NULL); }
+
 static void set_sleep_img(struct zmk_widget_sleep_status *widget,
                           struct zmk_activity_state_changed ev) {
     switch (ev.state) {
@@ -36,6 +41,7 @@ static void set_sleep_img(struct zmk_widget_sleep_status *widget,
         LOG_DBG("ACTIVITY EVENT IDLE");
 #if IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE)
         lv_obj_remove_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
+        show_art_now();
 #else
         lv_obj_add_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
 #endif
@@ -44,6 +50,7 @@ static void set_sleep_img(struct zmk_widget_sleep_status *widget,
         LOG_DBG("ACTIVITY EVENT SLEEP");
 #if IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP)
         lv_obj_remove_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
+        show_art_now();
 #else
         lv_obj_add_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
 #endif
