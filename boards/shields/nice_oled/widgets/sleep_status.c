@@ -28,7 +28,12 @@ LV_IMG_DECLARE(street_sleep_32x128);
 // With CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=y ZMK stops the display updates when the keyboard goes
 // idle or to sleep. The art is shown at that same moment, so it is drawn right away: waiting for
 // the next display tick would leave the screen as it was, or half drawn.
-static void show_art_now(void) { lv_refr_now(NULL); }
+static void show_art_now(struct zmk_widget_sleep_status *widget) {
+    // Some widgets create their images later (the smart battery animation does it on the first
+    // battery report), so they would sit above the art: bring it to the front first.
+    lv_obj_move_foreground(widget->obj);
+    lv_refr_now(NULL);
+}
 
 static void set_sleep_img(struct zmk_widget_sleep_status *widget,
                           struct zmk_activity_state_changed ev) {
@@ -41,7 +46,7 @@ static void set_sleep_img(struct zmk_widget_sleep_status *widget,
         LOG_DBG("ACTIVITY EVENT IDLE");
 #if IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE)
         lv_obj_remove_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
-        show_art_now();
+        show_art_now(widget);
 #else
         lv_obj_add_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
 #endif
@@ -50,7 +55,7 @@ static void set_sleep_img(struct zmk_widget_sleep_status *widget,
         LOG_DBG("ACTIVITY EVENT SLEEP");
 #if IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP)
         lv_obj_remove_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
-        show_art_now();
+        show_art_now(widget);
 #else
         lv_obj_add_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
 #endif
