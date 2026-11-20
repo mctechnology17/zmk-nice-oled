@@ -335,6 +335,20 @@ static void draw_canvas(lv_obj_t *widget, uint8_t cbuf[], const struct status_st
     rotate_canvas(canvas, cbuf);
 }
 
+// One redraw per burst of changes (idea of @chalukyaj): an update only stores its state and asks
+// for a redraw. The work item is queued once on the display queue, so the updates that are
+// already waiting there run first and the canvas is drawn and rotated a single time for all.
+static void redraw_work_cb(struct k_work *work) {
+    struct zmk_widget_screen *widget;
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
+        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    }
+}
+
+static K_WORK_DEFINE(redraw_work, redraw_work_cb);
+
+static void request_redraw(void) { k_work_submit_to_queue(zmk_display_work_q(), &redraw_work); }
+
 /**
  * Battery status
  **/
@@ -348,7 +362,7 @@ static void set_battery_status(struct zmk_widget_screen *widget,
 
     widget->state.battery = state.level;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 
     // draw_animation(widget->obj, widget);
 
@@ -402,7 +416,7 @@ static void set_connection_status(struct zmk_widget_screen *widget,
                                   struct peripheral_status_state state) {
     widget->state.connected = state.connected;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void output_status_update_cb(struct peripheral_status_state state) {
@@ -418,7 +432,7 @@ ZMK_SUBSCRIPTION(widget_peripheral_status, zmk_split_peripheral_status_changed);
 static void set_modifiers_peripheral_status(struct zmk_widget_screen *widget,
                                             struct modifiers_peripheral_status_state state) {
     widget->state.mod_state = state.mods;
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void modifiers_peripheral_status_update_cb(struct modifiers_peripheral_status_state state) {
@@ -446,7 +460,7 @@ static void set_profile_peripheral_status(struct zmk_widget_screen *widget,
     widget->state.active_profile_index = state.index;
     widget->state.active_profile_connected = state.connected;
     widget->state.active_profile_bonded = state.bonded;
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void profile_peripheral_status_update_cb(struct zmk_profile_peripheral_state state) {
@@ -472,7 +486,7 @@ static void set_layer_peripheral_status(struct zmk_widget_screen *widget,
                                         struct zmk_layer_peripheral_state state) {
     widget->state.layer_index = state.index;
     widget->state.layer_label = state.label;
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void layer_peripheral_status_update_cb(struct zmk_layer_peripheral_state state) {
@@ -498,7 +512,7 @@ static void set_central_battery_peripheral_status(
     struct zmk_widget_screen *widget, struct zmk_central_battery_peripheral_state_changed state) {
     widget->state.central_battery_level = state.level;
     widget->state.central_battery_charging = state.charging;
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void central_battery_peripheral_status_update_cb(
@@ -531,7 +545,7 @@ static void set_pointer_peripheral_status(struct zmk_widget_screen *widget,
     widget->state.pointer_y = state.y;
     widget->state.pointer_buttons = state.buttons;
     widget->state.pointer_ripple = state.ripple;
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void pointer_peripheral_status_update_cb(struct zmk_pointer_status_state state) {

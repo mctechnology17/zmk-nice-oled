@@ -40,6 +40,7 @@ Migration to the next ZMK version. This branch does not build with ZMK v0.3: use
 - [x] **Raw HID** a report shorter than the report size is handled on a zero-padded copy, never past the bytes that arrived (over Bluetooth any host can write to the characteristic)
 - [x] **docs/OPTIMIZE.md** rewritten for LVGL 9: the old presets recommended a display thread stack of 2048 to 5120 and a pool of 4096, values that freeze the keyboard on this branch. New sections: which value wins, how to check the merged configuration, battery, and how to find the cause of a freeze
 - [x] **README** corrected: LVGL pool defaults (16384 central, 8192 peripheral), the responsive option no longer lowers the stack, and the status canvas is rotated at runtime (about 51 KB of RAM with LVGL 9)
+- [x] **Display** one redraw per burst of changes: a widget update stores its state and asks for a redraw, and the canvas is drawn and rotated once for all the updates that were waiting (before: once per update). Less CPU while typing. Thanks @chalukyaj for the idea (#22)
 - [ ] A Corne central with nice!nano, nice!view and RAW HID over Bluetooth froze once while it was also connected to a second Bluetooth host (Nov 20, 2026). Cause not confirmed yet
 
 # FEATURES NEXT (not released yet, planned as v0.0.3.1 · ZMK v0.3)

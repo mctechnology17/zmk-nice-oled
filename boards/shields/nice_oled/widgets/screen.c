@@ -209,6 +209,20 @@ static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 static void draw_canvas(lv_obj_t *widget, uint8_t cbuf[], const struct status_state *state);
 //  Fin Declaración adelantada
 
+// One redraw per burst of changes (idea of @chalukyaj): an update only stores its state and asks
+// for a redraw. The work item is queued once on the display queue, so the updates that are
+// already waiting there run first and the canvas is drawn and rotated a single time for all.
+static void redraw_work_cb(struct k_work *work) {
+    struct zmk_widget_screen *widget;
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
+        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    }
+}
+
+static K_WORK_DEFINE(redraw_work, redraw_work_cb);
+
+static void request_redraw(void) { k_work_submit_to_queue(zmk_display_work_q(), &redraw_work); }
+
 /**
  * sleep status
  **/
@@ -533,7 +547,7 @@ static void set_mods_status(struct zmk_widget_screen *widget,
     // Obtiene el estado actual de los modificadores directamente
     widget->state.mod_state = zmk_hid_get_explicit_mods();
     // Vuelve a dibujar todo el canvas para reflejar el cambio
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 #endif
 }
 
@@ -733,7 +747,7 @@ static void hid_is_connected_update_cb(struct is_connected_notification is_conne
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         widget->state.is_connected = is_connected.value;
         // Llama a la función principal de dibujo para actualizar toda la pantalla
-        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+        request_redraw();
     }
 }
 
@@ -756,7 +770,7 @@ static void hid_time_update_cb(struct time_notification time) {
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         widget->state.hour = time.hour;
         widget->state.minute = time.minute;
-        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+        request_redraw();
     }
 }
 
@@ -778,7 +792,7 @@ static void hid_volume_update_cb(struct volume_notification volume) {
     struct zmk_widget_screen *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         widget->state.volume = volume.value;
-        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+        request_redraw();
     }
 }
 
@@ -801,7 +815,7 @@ static void hid_layout_update_cb(struct layout_notification layout) {
     struct zmk_widget_screen *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         widget->state.layout = layout.value;
-        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+        request_redraw();
     }
 }
 
@@ -819,7 +833,7 @@ static void weather_status_update_cb(struct weather_notification weather) {
     struct zmk_widget_screen *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         widget->state.temperature = weather.temperature;
-        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+        request_redraw();
     }
 }
 
@@ -845,7 +859,7 @@ static void spotify_status_update_cb(struct spotify_notification spotify) {
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         memcpy(widget->state.media_player, spotify.media_player,
                sizeof(widget->state.media_player));
-        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+        request_redraw();
     }
 }
 
@@ -869,7 +883,7 @@ static void world_cup_status_update_cb(struct world_cup_notification world_cup) 
     struct zmk_widget_screen *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         memcpy(widget->state.world_cup, world_cup.score, sizeof(widget->state.world_cup));
-        draw_canvas(widget->obj, widget->cbuf, &widget->state);
+        request_redraw();
     }
 }
 
@@ -961,7 +975,7 @@ static void set_battery_status(struct zmk_widget_screen *widget,
 
     widget->state.battery = state.level;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void battery_status_update_cb(struct battery_status_state state) {
@@ -1002,7 +1016,7 @@ static void set_battery_status(struct zmk_widget_screen *widget, struct battery_
     widget->state.batteries[state.source].level = state.level;
     widget->state.batteries[state.source].usb_present = state.usb_present;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 void battery_status_update_cb(struct battery_state state) {
@@ -1070,7 +1084,7 @@ static void set_layer_status(struct zmk_widget_screen *widget, struct layer_stat
     widget->state.layer_index = state.index;
     widget->state.layer_label = state.label;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void layer_status_update_cb(struct layer_status_state state) {
@@ -1100,7 +1114,7 @@ static void set_output_status(struct zmk_widget_screen *widget,
     widget->state.active_profile_connected = state->active_profile_connected;
     widget->state.active_profile_bonded = state->active_profile_bonded;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void output_status_update_cb(struct output_status_state state) {
@@ -1139,7 +1153,7 @@ static void set_wpm_status(struct zmk_widget_screen *widget, struct wpm_status_s
     }
     widget->state.wpm[9] = state.wpm;
 
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void wpm_status_update_cb(struct wpm_status_state state) {
@@ -1163,7 +1177,7 @@ static void set_pointer_status(struct zmk_widget_screen *widget,
     widget->state.pointer_y = state.y;
     widget->state.pointer_buttons = state.buttons;
     widget->state.pointer_ripple = state.ripple;
-    draw_canvas(widget->obj, widget->cbuf, &widget->state);
+    request_redraw();
 }
 
 static void pointer_status_update_cb(struct zmk_pointer_status_state state) {
