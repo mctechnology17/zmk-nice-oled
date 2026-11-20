@@ -1010,6 +1010,7 @@ This project is built upon the foundation of numerous innovative contributions f
 *   **@codyd51**: For [Mighty-Mitts](https://github.com/codyd51/Mighty-Mitts).
 *   **@badjeff**: For [zmk-hid-io](https://github.com/badjeff/zmk-hid-io).
 *   **@carrefinho**: For [prospector-zmk-module](https://github.com/carrefinho/prospector-zmk-module).
+*   **@chalukyaj**: For the idea of drawing the canvas once per burst of widget updates, and for the profiling of the canvas rotation on LVGL 9 ([#22](https://github.com/mctechnology17/zmk-nice-oled/issues/22)).
 
 Your contributions have been instrumental in making this modular shield system possible. Thank you for open-sourcing your work and driving the ZMK ecosystem forward.
 
