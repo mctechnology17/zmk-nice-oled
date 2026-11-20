@@ -42,7 +42,7 @@
 
 # Overview
 > [!WARNING]
-> TESTED USING ZMK v0.3.0 please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
+> THIS BRANCH (`zmk-v0.4`) IS FOR THE NEXT ZMK (Zephyr 4.1, LVGL 9): TESTED USING ZMK `main` AT COMMIT `4de3133672`. For ZMK v0.3.0 use `revision: zmk-v0.3`. Please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
 
 Vertical widgets for [oled] and [niceview] screens using zmk (for split and non-split keyboards)
 
@@ -151,7 +151,7 @@ Every release says which ZMK version it was tested with. The full list of change
 # Quick Installation
 > [!WARNING]
 >
-> TESTED USING ZMK v0.3.0 please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
+> THIS BRANCH (`zmk-v0.4`) IS FOR THE NEXT ZMK (Zephyr 4.1, LVGL 9): TESTED USING ZMK `main` AT COMMIT `4de3133672`. For ZMK v0.3.0 use `revision: zmk-v0.3`. Please see [Pin your ZMK version](https://zmk.dev/blog/2025/06/20/pinned-zmk)
 
 > [!TIP]
 >
