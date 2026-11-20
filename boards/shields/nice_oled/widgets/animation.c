@@ -50,7 +50,7 @@ const lv_img_dsc_t *street_chase_imgs[] = {
     &street_chase_08, &street_chase_09, &street_chase_10, &street_chase_11,
     &street_chase_12, &street_chase_13, &street_chase_14, &street_chase_15,
 };
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
+#elif !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM) && IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
 
 LV_IMG_DECLARE(head_00);
 LV_IMG_DECLARE(head_01);
@@ -73,7 +73,8 @@ const lv_img_dsc_t *head_imgs[] = {&head_00, &head_01, &head_02, &head_03, &head
                                    &head_06, &head_07, &head_08, &head_09, &head_10, &head_11,
                                    &head_12, &head_13, &head_14, &head_15};
 
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT)
+#elif !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM) && IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT) && \
+    !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN) && !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON)
 LV_IMG_DECLARE(cat_0);
 LV_IMG_DECLARE(cat_1);
 LV_IMG_DECLARE(cat_2);
@@ -85,7 +86,7 @@ LV_IMG_DECLARE(cat_7);
 
 const lv_img_dsc_t *cat_imgs[] = {&cat_0, &cat_1, &cat_2, &cat_3, &cat_4, &cat_5, &cat_6, &cat_7};
 
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN)
+#elif !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM) && IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN)
 
 LV_IMG_DECLARE(spaceman_00);
 LV_IMG_DECLARE(spaceman_01);
@@ -114,7 +115,7 @@ const lv_img_dsc_t *spaceman_imgs[] = {&spaceman_00, &spaceman_01, &spaceman_02,
                                        &spaceman_12, &spaceman_13, &spaceman_14, &spaceman_15,
                                        &spaceman_16, &spaceman_17, &spaceman_18, &spaceman_19};
 
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON)
+#elif !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM) && IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON)
 LV_IMG_DECLARE(pokemon_00);
 LV_IMG_DECLARE(pokemon_01);
 LV_IMG_DECLARE(pokemon_02);
@@ -203,13 +204,14 @@ void draw_animation(lv_obj_t *canvas, struct zmk_widget_screen *widget) {
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE)
     lv_animimg_set_src(art, (const void **)street_chase_imgs, 16);
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
+#elif !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM) && IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
     lv_animimg_set_src(art, (const void **)head_imgs, 16);
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT)
+#elif !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM) && IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT) && \
+    !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN) && !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON)
     lv_animimg_set_src(art, (const void **)cat_imgs, 8);
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN)
+#elif !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM) && IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN)
     lv_animimg_set_src(art, (const void **)spaceman_imgs, 20);
-#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON)
+#elif !IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM) && IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON)
     lv_animimg_set_src(art, (const void **)pokemon_imgs, 48);
 #else
     lv_animimg_set_src(art, (const void **)crystal_imgs, 16);

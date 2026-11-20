@@ -110,29 +110,41 @@ config NICE_OLED_SLEEP_ART_STREET
 ### WIDGET ON PERIPHERAL START {{{
 ### SMART_BATTERY {{{
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY
-    bool "Enable animation on peripheral"
+    bool "Peripheral animation plays only while charging"
     default n
+    help
+      The peripheral animation plays while the battery is charging and shows
+      its first frame otherwise. By default it uses the animation chosen with
+      NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_<NAME>; the options
+      NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_<NAME> override it.
 
 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY
 
+# Each one follows the matching peripheral animation unless it is set by hand.
+# The cat is the default animation, so any other choice wins over it.
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_CAT
     bool "Use cat animation for peripheral smart battery"
+    default y if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT
     default n
 
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_HEAD
     bool "Use head animation for peripheral smart battery"
+    default y if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD
     default n
 
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_POKEMON
     bool "Use pokemon animation for peripheral smart battery"
+    default y if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON
     default n
 
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_SPACEMAN
     bool "Use spaceman animation for peripheral smart battery"
+    default y if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN
     default n
 
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_GEM
     bool "Use gem animation for peripheral smart battery"
+    default y if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM
     default y if !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_CAT && !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_HEAD && !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_POKEMON && !NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_SPACEMAN
     default n
 
@@ -388,6 +400,9 @@ config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS
     int "Animation length in milliseconds"
     default 2400 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_STREET_CHASE
+    # An explicit gem wins over the rest (same order as animation.c and battery.c).
+    default 960 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_GEM
+    default 960 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM
     default 10000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_POKEMON
     default 10000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON
     default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY_HEAD
