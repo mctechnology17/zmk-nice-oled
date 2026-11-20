@@ -39,18 +39,20 @@ typedef enum {
 
 static bool is_connected = false;
 
-static void on_disconnect_timer(struct k_timer *dummy) {
+// Both run on the system work queue, not in a kernel timer: a timer callback is interrupt
+// context, and raising an event there runs every listener (the display ones take a mutex) in it.
+static void disconnect_work_handler(struct k_work *work) {
     LOG_INF("raise_connection_notification: false");
     is_connected = false;
     raise_is_connected_notification((struct is_connected_notification){.value = false});
 }
 
-K_TIMER_DEFINE(disconnect_timer, on_disconnect_timer, NULL);
+static K_WORK_DELAYABLE_DEFINE(disconnect_work, disconnect_work_handler);
 
 static uint8_t last_hid_volume = 0;
 static uint8_t last_raised_volume = 0;
 
-static void on_volume_timer(struct k_timer *dummy) {
+static void raise_volume_if_changed(void) {
     // prevent raising event with the same value multiple times
     if (last_raised_volume != last_hid_volume) {
         last_raised_volume = last_hid_volume;
@@ -59,13 +61,15 @@ static void on_volume_timer(struct k_timer *dummy) {
     }
 }
 
-K_TIMER_DEFINE(volume_timer, on_volume_timer, NULL);
+static void volume_work_handler(struct k_work *work) { raise_volume_if_changed(); }
+
+static K_WORK_DELAYABLE_DEFINE(volume_work, volume_work_handler);
 
 static void process_raw_hid_data(uint8_t *data) {
     LOG_INF("display_process_raw_hid_data - received data_type %u", data[0]);
 
     // raise disconnect notification after 65 seconds of inactivity
-    k_timer_start(&disconnect_timer, K_SECONDS(65), K_NO_WAIT);
+    k_work_reschedule(&disconnect_work, K_SECONDS(65));
     if (!is_connected) {
         LOG_INF("raise_connection_notification: true");
         is_connected = true;
@@ -81,10 +85,11 @@ static void process_raw_hid_data(uint8_t *data) {
     case _VOLUME:
         last_hid_volume = data[1];
 
-        // debounce volume change events
-        if (k_timer_status_get(&volume_timer) > 0 || k_timer_remaining_get(&volume_timer) == 0) {
-            k_timer_start(&volume_timer, K_MSEC(150), K_NO_WAIT);
-            on_volume_timer(&volume_timer);
+        // debounce volume change events: the first one is shown at once, the last one of a
+        // burst 150 ms later
+        if (!k_work_delayable_is_pending(&volume_work)) {
+            k_work_schedule(&volume_work, K_MSEC(150));
+            raise_volume_if_changed();
         }
 
         break;
@@ -133,8 +138,12 @@ static void process_raw_hid_data(uint8_t *data) {
 
 static int raw_hid_received_event_listener(const zmk_event_t *eh) {
     struct raw_hid_received_event *event = as_raw_hid_received_event(eh);
-    if (event) {
-        process_raw_hid_data(event->data);
+    if (event && event->length > 0) {
+        // A host can write fewer bytes than a full report (over Bluetooth any host that finds the
+        // characteristic can write to it): work on a zero-padded copy, never past what arrived.
+        uint8_t report[CONFIG_NICE_OLED_WIDGET_RAW_HID_REPORT_SIZE] = {0};
+        memcpy(report, event->data, MIN(event->length, sizeof(report)));
+        process_raw_hid_data(report);
     }
 
     return ZMK_EV_EVENT_BUBBLE;
