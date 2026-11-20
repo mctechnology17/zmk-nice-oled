@@ -370,12 +370,12 @@ static void set_battery_status(struct zmk_widget_screen *widget,
     if (widget->state.charging) {
         // mostrar
         // lv_obj_remove_flag(widget->obj, LV_OBJ_FLAG_HIDDEN);
-        animation_smart_battery_on(widget->obj);
+        animation_smart_battery_on(lv_obj_get_child(widget->obj, 0));
 
     } else {
         // quitar
         // lv_obj_add_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
-        animation_smart_battery_off(widget->obj);
+        animation_smart_battery_off(lv_obj_get_child(widget->obj, 0));
     }
 #endif
 }
