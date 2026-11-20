@@ -245,7 +245,7 @@ This document lists the available configuration options for the `nice_oled` shie
 | `CONFIG_ZMK_DISPLAY_WORK_QUEUE` | choice | `ZMK_DISPLAY_WORK_QUEUE_DEDICATED` | Work queue type |
 | `CONFIG_ZMK_DISPLAY_STATUS_SCREEN` | choice | `ZMK_DISPLAY_STATUS_SCREEN_CUSTOM` | Status screen type |
 | `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE` | bool | `n` (OLED), `y` (ePaper) | Control display blanking on idle for nice_custom/nice_epaper |
-| `CONFIG_LV_Z_MEM_POOL_SIZE` | int | `8192` | Memory pool size |
+| `CONFIG_LV_Z_MEM_POOL_SIZE` | int | `16384` (central or non-split), `8192` (peripheral) | Memory pool size |
 | `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE` | int | `8192` (set in the shield `.conf`) | Display thread stack size |
 | `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY` | int | `5` | Display thread priority (lower = higher priority) |
 | `CONFIG_NICE_OLED_WIDGET_STATUS` | bool | - | Custom nice oled status widget (Selects LVGL features) |
@@ -346,7 +346,7 @@ All the options of the sender and the receiver are in the README of
 | `CONFIG_NICE_OLED_WIDGET_WPM_LUNA_ANIMATION_MS` | int | `300` | Luna Animation in ms for WPM Widget |
 | `CONFIG_NICE_OLED_WIDGET_WPM_BONGO_CAT` | bool | `n` | Enable wpm bongo cat |
 | `CONFIG_NICE_OLED_WIDGET_WPM_BONGO_CAT_ANIMATION_MS` | int | `300` | Bongo Cat Animation in ms for WPM Widget |
-| `CONFIG_NICE_OLED_WIDGET_RESPONSIVE` | bool | `n` | Enable widget responsive (overrides stack to `4096`, priority to `3`) |
+| `CONFIG_NICE_OLED_WIDGET_RESPONSIVE` | bool | `n` | Enable widget responsive (sets the display thread priority to `3`) |
 | `CONFIG_NICE_OLED_WIDGET_RESPONSIVE_BONGO_CAT` | bool | `n` | Enable widget responsive bongo cat |
 
 ## HID Indicators
@@ -979,7 +979,7 @@ While `nice_oled` offers advanced features, there are hardware and software cons
 - Memory Usage (RAM) This shield uses the LVGL graphics library, which can be memory-intensive.
   *   **High Consumption**: Enabling multiple large widgets (WPM Graph, Bongo Cat, Raw HID) can exhaust the available RAM on the microcontroller (nRF52840).
   *   **Symptoms**: If memory is low, you may experience display artifacts, freezing, or Bluetooth instability.
-  *   **Mitigation**: Use the "Balanced" or "Minimal" presets described in `OPTIMIZE.md` if you encounter issues.
+  *   **Mitigation**: Disable the widgets you do not use (see [`docs/OPTIMIZE.md`](docs/OPTIMIZE.md)). Do not lower the display thread stack or the LVGL pool: with LVGL 9 the old values (stack `2048` to `5120`, pool `4096`) freeze the keyboard.
 - Battery Life OLED displays and continuous animations consume power.
   *   **Peripheral Impact**: Running complex animations (like Pokemon or Bongo Cat) on the peripheral half (which has a smaller battery in some builds) will significantly reduce battery life.
   *   **Refresh Rate**: Higher animation speeds (lower ms values) increase CPU usage, preventing the processor from sleeping.
@@ -991,10 +991,9 @@ While `nice_oled` offers advanced features, there are hardware and software cons
   *   **Typing Latency**: If the display thread priority is set too high (`1` or `2`), it might interrupt key scanning, causing perceived input lag during heavy animations.
   *   **Smart Battery**: The experimental "Smart Battery" animation uses significant compute resources and is **not recommended** for stability-focused builds.
   *   **Mitigation**: Keep `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY` at default (`5`) or lower (`10`).
-- Image Rotation Strategy To maximize efficiency on the nRF52840, **real-time image rotation is avoided**.
-  *   **Pre-processing**: All animated assets are pre-rotated on the host computer during the design phase.
-  *   **Reasoning**: Performing geometric transformations (rotation) at runtime is computationally expensive and memory-intensive for this architecture.
-  *   **Implementation**: By storing assets as ready-to-render, pre-rotated bitmaps, we offload the processing burden from the MCU, ensuring smooth playback with minimal CPU overhead.
+- Image Rotation Strategy
+  *   **Animated assets are pre-rotated** on the host computer during the design phase and stored as ready-to-render bitmaps, so playing an animation needs no rotation on the MCU.
+  *   **The status canvas is rotated at runtime**: the widgets of the vertical layout (battery, output, WPM, layer, RAW HID, ...) are drawn on a canvas that is rotated once after every redraw (`rotate_canvas` in `widgets/util.c`). With LVGL 9 that canvas and its copy take about 51 KB of RAM.
 
 # Acknowledgments
 

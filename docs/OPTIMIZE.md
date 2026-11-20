@@ -1,137 +1,197 @@
 # Optimization Guide
 
-Advanced configuration guide for optimizing memory, CPU usage, and animations in the nice_oled shield.
+How to set memory, the display thread and the animations of the nice_oled shield.
+
+> [!IMPORTANT]
+> This guide is for the branch `zmk-v0.4` (ZMK v0.4, Zephyr 4.1, **LVGL 9**).
+> LVGL 9 needs about twice the stack and twice the memory pool of LVGL 8.
+> The values that older versions of this guide recommended (stack `2048` to
+> `5120`, pool `4096`) are too small now: with them the display thread
+> overflows its stack and **the whole keyboard freezes a few seconds after it
+> starts** (no keys, no display updates).
+> If you copied one of the old presets into your `.conf`, remove those lines.
+> For ZMK v0.3 use the guide of the branch `zmk-v0.3`.
 
 ## Table of Contents
 
-- [Important Considerations](#important-considerations)
-- [Memory Configuration](#memory-configuration)
-- [Display Thread Configuration](#display-thread-configuration)
-- [Animation Optimization](#animation-optimization)
-- [Build Optimization](#build-optimization)
+- [The short version](#the-short-version)
+- [Which value wins](#which-value-wins)
+- [Check what your build really uses](#check-what-your-build-really-uses)
+- [Display thread](#display-thread)
+- [Memory](#memory)
+- [Animations](#animations)
+- [Battery](#battery)
+- [Disable what you do not use](#disable-what-you-do-not-use)
 - [Presets](#presets)
-- [ZMK Integration](#zmk-integration)
+- [The keyboard freezes: how to find out why](#the-keyboard-freezes-how-to-find-out-why)
+- [Troubleshooting](#troubleshooting)
+- [Module impact reference](#module-impact-reference)
 
 ---
 
-## Important Considerations
+## The short version
 
-This shield merges with your ZMK keyboard configuration and shares resources with the main firmware. Poor configuration can affect:
+The shield already sets what LVGL 9 needs. You do not have to add anything:
 
-- **Typing latency**: If the display consumes too many resources
-- **Bluetooth stability**: If memory is insufficient
-- **Battery life**: Frequent animations = higher consumption
+| Option | Default of this branch | Where it is set |
+|---|---|---|
+| `CONFIG_ZMK_DISPLAY_WORK_QUEUE_DEDICATED` | `y` | `Kconfig.defconfig` |
+| `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE` | `8192` | `nice_oled.conf`, `nice_epaper.conf`, `nice_custom.conf` |
+| `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY` | `5` (`3` with `NICE_OLED_WIDGET_RESPONSIVE`) | `Kconfig.defconfig` |
+| `CONFIG_LV_Z_MEM_POOL_SIZE` | `16384` central or non-split, `8192` peripheral | `Kconfig.defconfig` |
+| `CONFIG_LV_Z_VDB_SIZE` | `64` OLED, `100` nice!view | `Kconfig.defconfig` |
 
-> Always test your configuration by typing quickly while animations are active.
+Rules:
 
----
-
-## Memory Configuration
-
-### LVGL Memory Pool
-
-The memory pool is used by LVGL for dynamic allocations (widgets, images, animations).
-
-```ini
-CONFIG_LV_Z_MEM_POOL_SIZE=8192
-```
-
-| Value | Use Case | Notes |
-|-------|----------|-------|
-| `4096` | Minimal setup, static images only | Default ZMK value |
-| `8192` | Standard setup with animations | **Recommended** |
-| `10000` | Multiple animations + RAW HID | For complex setups |
-| `12288` | All features enabled | High memory usage |
-
-**Symptoms of insufficient memory:**
-- Display freezes or shows artifacts
-- Animations stop working
-- Keyboard becomes unresponsive
-
-### VDB (Virtual Display Buffer) Size
-
-Controls the percentage of the display buffer in RAM.
-
-```ini
-CONFIG_LV_Z_VDB_SIZE=64
-```
-
-| Value | Display Type | RAM Usage |
-|-------|--------------|-----------|
-| `64` | OLED 128x32 | ~256 bytes |
-| `100` | ePaper/Custom | Full buffer |
-
-> Lower values reduce RAM but increase CPU usage (more refresh cycles).
-
-### Bits Per Pixel
-
-```ini
-CONFIG_LV_Z_BITS_PER_PIXEL=1
-```
-
-For monochrome displays, always use `1`. Higher values waste memory.
-
-### Color Depth
-
-```ini
-CONFIG_LV_COLOR_DEPTH_1=y
-```
-
-For monochrome OLED/ePaper displays, use 1-bit color depth.
+1. Do not set the stack below `8192` or the pool below the defaults.
+2. Do not lower them to save RAM: the nRF52840 has 256 KB and a full central
+   build uses about 168 KB.
+3. If the keyboard freezes, first [check what your build really
+   uses](#check-what-your-build-really-uses).
 
 ---
 
-## Display Thread Configuration
+## Which value wins
 
-### Stack Size
+The same option can be set in several places. From weakest to strongest:
 
-Controls the stack allocated for the display thread.
+1. `Kconfig.defconfig` of the shields and modules (defaults).
+2. `.conf` of every shield in your `shield:` line (this is where the stack
+   of this shield is set).
+3. Your own `config/<keyboard>.conf`.
+4. `cmake-args` in `build.yaml` (`-DCONFIG_...=...`).
 
-```ini
-CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=2048
+So a line in your own `.conf` or in `cmake-args` beats the value of this
+shield. That is how an old preset lowers the stack without any warning.
+
+Two more things to know:
+
+- ZMK defines `CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE` before the
+  shield defaults are read, so a `default` in a `Kconfig.defconfig` never
+  applies to it. Only a `.conf` or `cmake-args` can change it.
+- The shield of your keyboard can set display defaults too (for example
+  `LV_Z_VDB_SIZE` or `LV_DPI_DEF`). When two shields set a default for the
+  same option, the first one read wins. For those two options that is fine.
+
+---
+
+## Check what your build really uses
+
+Do not guess: look at the merged configuration of the build.
+
+Local build:
+
+```sh
+grep -E "ZMK_DISPLAY_WORK_QUEUE_DEDICATED|ZMK_DISPLAY_DEDICATED_THREAD|LV_Z_MEM_POOL_SIZE|LV_Z_VDB_SIZE" build/zephyr/.config
 ```
 
-| Value | Use Case |
-|-------|----------|
-| `2048` | Default, basic widgets |
-| `3072` | Standard animations |
-| `4096` | Responsive widgets, complex animations |
-| `5120` | All features + RAW HID |
+GitHub Actions: open the build job, step "Kconfig file" (it prints the
+merged `.config`), and search for the same names.
 
-**Increase if you see:**
-- Stack overflow errors in logs
-- Random crashes during animations
-- Display not updating
-
-### Thread Priority
+Expected on this branch:
 
 ```ini
+CONFIG_ZMK_DISPLAY_WORK_QUEUE_DEDICATED=y
+CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=8192
 CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY=5
+CONFIG_LV_Z_MEM_POOL_SIZE=16384   # 8192 on a peripheral
 ```
 
-| Value | Behavior |
-|-------|----------|
-| `1` | Highest priority (smoother animations, may affect typing) |
-| `5` | Balanced (default) |
-| `10` | Lower priority (typing prioritized over display) |
+---
 
-### Work Queue
+## Display thread
+
+### Stack size
+
+```ini
+CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=8192
+```
+
+Measured with the thread analyzer on a Corne central with a nice!view, the
+default widgets and RAW HID: 3784 bytes on one board and 3728 on another.
+ZMK alone gives 3072, which overflows. `8192` leaves room for the widgets
+that were not measured (Luna, Bongo Cat, responsive, the peripheral
+animations).
+
+| Value | Result |
+|---|---|
+| `2048` to `3584` | Overflows: the keyboard freezes a few seconds after it starts |
+| `4096` to `6144` | Works with the default widgets, with little or no margin |
+| `8192` | **Default. Keep it** |
+
+A stack overflow in the display thread stops the whole firmware, not only
+the display: the keys stop too.
+
+### Work queue
 
 ```ini
 CONFIG_ZMK_DISPLAY_WORK_QUEUE_DEDICATED=y
 ```
 
-Options:
-- `ZMK_DISPLAY_WORK_QUEUE_DEDICATED` - Dedicated thread for display (recommended)
-- `ZMK_DISPLAY_WORK_QUEUE_SYSTEM` - Shared with system (saves RAM, may lag)
+Keep the dedicated thread. With `ZMK_DISPLAY_WORK_QUEUE_SYSTEM` the display
+is drawn on the system work queue, whose stack (`3072` in ZMK) is too small
+for LVGL 9 and is shared with the rest of the firmware.
+
+### Priority
+
+```ini
+CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY=5
+```
+
+A lower number is a higher priority.
+
+| Value | Behavior |
+|---|---|
+| `1` to `2` | Display first. Can delay key scanning during heavy animations |
+| `3` | Used by `NICE_OLED_WIDGET_RESPONSIVE` |
+| `5` | Default |
+| `10` | Typing first, the display waits |
 
 ---
 
-## Animation Optimization
+## Memory
 
-### Animation Duration
+### LVGL memory pool
 
-Longer durations = less CPU usage, smoother appearance.
+```ini
+CONFIG_LV_Z_MEM_POOL_SIZE=16384
+```
+
+Used by LVGL for objects, animations and drawing.
+
+| Value | Use |
+|---|---|
+| `4096` | Too small for LVGL 9 (it was the LVGL 8 value) |
+| `8192` | Peripheral half (default there) |
+| `16384` | Central or non-split keyboard (default there) |
+
+When the pool is too small the display stops updating or shows garbage. If
+you see that on a peripheral with a long animation, try `12288`.
+
+### Canvas
+
+Since LVGL 9 the canvas is a square of 160x160 pixels with one byte per
+pixel, plus a copy of the same size that is used to rotate it: about 51 KB
+of RAM that are not part of the pool. This is fixed and it is the main
+reason why a build with this shield uses more RAM than one with the
+`nice_view` shield of ZMK.
+
+### VDB size
+
+```ini
+CONFIG_LV_Z_VDB_SIZE=64
+```
+
+Percentage of the screen that LVGL renders in one pass. `64` for OLED and
+`100` for nice!view are the defaults; a lower value saves a little RAM and
+costs more refresh passes. `CONFIG_LV_Z_BITS_PER_PIXEL=1` and
+`CONFIG_LV_COLOR_DEPTH_1=y` are set by the shield: do not change them.
+
+---
+
+## Animations
+
+Longer durations mean fewer redraws and less CPU.
 
 ```ini
 # Luna/Bongo Cat animations
@@ -140,43 +200,13 @@ CONFIG_NICE_OLED_WIDGET_WPM_BONGO_CAT_ANIMATION_MS=300
 CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ANIMATION_MS=300
 CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA_ANIMATION_MS=300
 
-# Peripheral animations
+# Peripheral animations (length of the whole loop)
 CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS=960
 ```
 
-| Value | Effect |
-|-------|--------|
-| `200` | Fast, high CPU |
-| `300` | Balanced |
-| `500` | Smooth, low CPU |
-| `1000+` | Very smooth, minimal CPU |
-
-### Disable Unnecessary Animations
-
-To save resources, disable animations you don't need:
+A static image instead of an animation on the peripheral:
 
 ```ini
-# Disable WPM animations
-CONFIG_NICE_OLED_WIDGET_WPM_LUNA=n
-CONFIG_NICE_OLED_WIDGET_WPM_BONGO_CAT=n
-
-# Disable HID indicator animations
-CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA=n
-CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT=n
-
-# Disable modifier animations
-CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA=n
-
-# Disable peripheral animations
-CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL=n
-```
-
-### Static Images vs Animations
-
-Static images use significantly less resources:
-
-```ini
-# Use static image instead of animation on peripheral
 CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL=n
 CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL=y
 CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL_VIM=y
@@ -184,62 +214,59 @@ CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL_VIM=y
 
 ---
 
-## Build Optimization
+## Battery
 
-### Compiler Optimization Level
+What costs battery is how often the screen is redrawn, not the stack or the
+pool sizes (RAM that is reserved costs nothing).
 
-In your `CMakeLists.txt` or build configuration:
+- Every change of a widget redraws and rotates the whole canvas. Widgets that
+  change all the time (WPM, modifiers, responsive Bongo Cat) keep the CPU
+  awake while you type.
+- On the peripheral, an animation redraws many times per second, all day. A
+  static image is the cheapest choice
+  (`CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL=y`), and
+  `CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SMART_BATTERY=y` plays the
+  animation only while charging.
+- A nice!view keeps its image without power; an OLED uses power for every
+  lit pixel.
+
+---
+
+## Disable what you do not use
 
 ```ini
-CONFIG_SIZE_OPTIMIZATIONS=y      # Optimize for size (-Os)
-# or
-CONFIG_SPEED_OPTIMIZATIONS=y     # Optimize for speed (-O2)
-```
-
-For most keyboards, size optimization is preferred.
-
-### Disable Unused Features
-
-```ini
-# Disable WPM if not needed
+# WPM
 CONFIG_NICE_OLED_WIDGET_WPM=n
 CONFIG_ZMK_WPM=n
 
-# Disable RAW HID if not used
+# RAW HID
 CONFIG_NICE_OLED_WIDGET_RAW_HID=n
 
-# Disable responsive widgets
+# Responsive widgets
 CONFIG_NICE_OLED_WIDGET_RESPONSIVE=n
 
-# Disable sleep art
+# Sleep art
 CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE=n
 CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP=n
-```
 
-### Font Optimization
-
-Only include fonts you need:
-
-```ini
-# Disable extra fonts if not using RAW HID
-CONFIG_LV_FONT_MONTSERRAT_14=n
-CONFIG_LV_FONT_MONTSERRAT_22=n
+# Animations
+CONFIG_NICE_OLED_WIDGET_WPM_LUNA=n
+CONFIG_NICE_OLED_WIDGET_WPM_BONGO_CAT=n
+CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA=n
+CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT=n
+CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA=n
 ```
 
 ---
 
 ## Presets
 
-### Minimal (Low Memory)
+None of them touches the stack, the work queue or the pool: the defaults of
+the shield are right for all three.
 
-For keyboards with limited resources:
+### Minimal (longest battery life)
 
 ```ini
-CONFIG_LV_Z_MEM_POOL_SIZE=4096
-CONFIG_LV_Z_VDB_SIZE=64
-CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=2048
-CONFIG_ZMK_DISPLAY_WORK_QUEUE_SYSTEM=y
-
 CONFIG_NICE_OLED_WIDGET_WPM=n
 CONFIG_NICE_OLED_WIDGET_HID_INDICATORS=n
 CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA=n
@@ -247,16 +274,9 @@ CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL=n
 CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL=y
 ```
 
-### Balanced (Recommended)
-
-Good balance between features and resources:
+### Balanced (recommended)
 
 ```ini
-CONFIG_LV_Z_MEM_POOL_SIZE=8192
-CONFIG_LV_Z_VDB_SIZE=64
-CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=2048
-CONFIG_ZMK_DISPLAY_WORK_QUEUE_DEDICATED=y
-
 CONFIG_NICE_OLED_WIDGET_WPM=y
 CONFIG_NICE_OLED_WIDGET_WPM_LUNA=y
 CONFIG_NICE_OLED_WIDGET_WPM_LUNA_ANIMATION_MS=300
@@ -265,20 +285,11 @@ CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL=y
 CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS=960
 ```
 
-### Full Features (High Memory)
-
-All features enabled:
+### Full features
 
 ```ini
-CONFIG_LV_Z_MEM_POOL_SIZE=12288
-CONFIG_LV_Z_VDB_SIZE=100
-CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=4096
-CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_PRIORITY=1
-CONFIG_ZMK_DISPLAY_WORK_QUEUE_DEDICATED=y
-
 CONFIG_NICE_OLED_WIDGET_WPM=y
 CONFIG_NICE_OLED_WIDGET_WPM_LUNA=y
-CONFIG_NICE_OLED_WIDGET_WPM_BONGO_CAT=n
 CONFIG_NICE_OLED_WIDGET_RESPONSIVE=y
 CONFIG_NICE_OLED_WIDGET_RAW_HID=y
 CONFIG_NICE_OLED_WIDGET_HID_INDICATORS=y
@@ -288,80 +299,54 @@ CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL=y
 
 ---
 
+## The keyboard freezes: how to find out why
+
+1. [Check the merged configuration](#check-what-your-build-really-uses). If
+   the stack is not `8192`, something in your config lowers it.
+2. Build with only `zmk` and `zmk-nice-oled` in `west.yml`, then add your
+   other modules back one at a time. A display module that is not ported to
+   LVGL 9 can break the build or the firmware.
+3. Read the log. Add the snippet `zmk-usb-logging` to the build of the half
+   that freezes, with these options:
+
+   ```ini
+   CONFIG_THREAD_ANALYZER=y
+   CONFIG_THREAD_ANALYZER_AUTO=y
+   CONFIG_THREAD_ANALYZER_USE_LOG=y
+   CONFIG_THREAD_ANALYZER_AUTO_INTERVAL=30
+   CONFIG_MPU_STACK_GUARD=y
+   ```
+
+   Connect that half by USB and read its serial port (for example
+   `cat /dev/ttyACM0` on Linux). Every 30 seconds the log lists each thread
+   with its stack use. A thread close to 100 % is the one to enlarge, and a
+   line with `FATAL` names the thread that failed.
+
+   On a nice!nano do not combine `zmk-usb-logging` with the snippet
+   `studio-rpc-usb-uart`: the board runs out of USB endpoints and does not
+   start. Leave ZMK Studio out of the debug build.
+
+---
+
 ## Troubleshooting
 
-| Problem | Possible Cause | Solution |
-|---------|----------------|----------|
-| Display freezes | Low memory pool | Increase `LV_Z_MEM_POOL_SIZE` |
-| Animations stuttering | Low thread priority | Decrease priority value (e.g., `1`) |
-| Stack overflow | Small stack size | Increase `DEDICATED_THREAD_STACK_SIZE` |
-| Slow response | Too many features | Disable unused widgets |
-| Build too large | Too many assets | Disable unused animations/images |
-| Typing lag | Display consuming too much CPU | Increase priority (e.g., `10`), reduce animations |
-| BLE disconnections | Insufficient memory | Reduce features, increase pool |
-| RAW HID not working | Stack too small | Increase to `3072` or more |
+| Problem | Likely cause | What to do |
+|---|---|---|
+| Keyboard freezes a few seconds after it starts (keys too) | Display thread stack too small | Remove old stack values from your config; check that the merged value is `8192` |
+| Display stops updating, keys still work | LVGL pool too small | Check `LV_Z_MEM_POOL_SIZE` (central `16384`, peripheral `8192`) |
+| Build fails in another display module | That module is not ported to LVGL 9 | Remove it from `west.yml` or use its Zephyr 4.1 branch |
+| Typing feels slow during animations | Display priority too high | Keep priority `5`, or `10` |
+| Battery drains fast | Screen redrawn all the time | Static image or smart battery on the peripheral, slower animations |
 
 ---
 
-## ZMK Integration
+## Module impact reference
 
-### How It Affects the Keyboard
+RAM and flash that each option saves when it is turned off. These numbers
+are estimates from ZMK v0.3 (LVGL 8) and were not measured again on this
+branch: use them only to compare options with each other.
 
-This shield shares resources with the main ZMK firmware:
-
-```
-+------------------+     +------------------+
-|   ZMK Firmware   |     |   nice_oled      |
-|------------------|     |------------------|
-| - Key scanning   |<--->| - LVGL rendering |
-| - BLE stack      |     | - Animations     |
-| - USB HID        |     | - RAW HID        |
-| - Layer logic    |     | - WPM tracking   |
-+------------------+     +------------------+
-         |                       |
-         +--------> RAM <--------+
-         +--------> CPU <--------+
-```
-
-### RAW HID and Resources
-
-When using RAW HID (time, volume, host layout):
-
-```ini
-# RAW HID requires additional memory
-CONFIG_NICE_OLED_WIDGET_RAW_HID=y
-CONFIG_LV_Z_MEM_POOL_SIZE=10000  # Increase pool
-CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=3072  # Increase stack
-
-# RAW HID configuration
-CONFIG_USB_HID_DEVICE_COUNT=2
-CONFIG_NICE_OLED_WIDGET_RAW_HID_REPORT_SIZE=32
-```
-
-### Split Keyboards
-
-For split keyboards, the central has more load than the peripheral:
-
-**Central (more resources):**
-```ini
-CONFIG_LV_Z_MEM_POOL_SIZE=8192
-CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=3072
-```
-
-**Peripheral (less resources):**
-```ini
-CONFIG_LV_Z_MEM_POOL_SIZE=4096
-CONFIG_ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE=2048
-CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS=1500  # Slower animations
-```
-
----
-
-## Module Impact Reference
-
-Approximate resource usage when enabling/disabling each module:
-
-### Central Modules
+### Central modules
 
 | Module | Config | RAM | Flash | Notes |
 |--------|--------|-----|-------|-------|
@@ -382,12 +367,12 @@ Approximate resource usage when enabling/disabling each module:
 | **RAW HID + Font** | (includes Montserrat 14) | -3KB | -8KB | RAW HID with font |
 | **Responsive** | `NICE_OLED_WIDGET_RESPONSIVE=n` | -0.5KB | -2KB | Keystroke animations |
 
-### Peripheral Modules
+### Peripheral modules
 
 | Module | Config | RAM | Flash | Notes |
 |--------|--------|-----|-------|-------|
 | **Animation Peripheral** | `NICE_OLED_WIDGET_ANIMATION_PERIPHERAL=n` | -1KB | -8KB | All peripheral animations |
-| **Cat Animation** | `NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT=n` | -0.5KB | -4KB | Cat sprites (2 frames) |
+| **Cat Animation** | `NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT=n` | -0.5KB | -4KB | Cat sprites |
 | **Gem Animation** | `NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_GEM=n` | -0.5KB | -3KB | Gem sprites |
 | **Pokemon Animation** | `NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON=n` | -1KB | -12KB | Many frames |
 | **Head Animation** | `NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD=n` | -0.5KB | -4KB | Head sprites |
@@ -395,39 +380,12 @@ Approximate resource usage when enabling/disabling each module:
 | **Static Image** | `NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL=y` | +0.1KB | -4KB | Static vs animated |
 | **Sleep Art** | `NICE_OLED_SHOW_SLEEP_ART_ON_IDLE=n` | -0.5KB | -2KB | Sleep screen image |
 
-### Optimization Examples
-
-**Minimal Setup** (save ~8KB RAM, ~30KB Flash):
-```ini
-CONFIG_NICE_OLED_WIDGET_WPM=n
-CONFIG_NICE_OLED_WIDGET_HID_INDICATORS=n
-CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA=n
-CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL=n
-CONFIG_NICE_OLED_WIDGET_STATIC_IMAGE_PERIPHERAL=y
-```
-
-**Keep WPM Luna only** (save ~4KB RAM, ~15KB Flash):
-```ini
-CONFIG_NICE_OLED_WIDGET_WPM_LUNA=y
-CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA=n
-CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA=n
-```
-
-**Disable all Luna** (save ~3KB RAM, ~12KB Flash):
-```ini
-CONFIG_NICE_OLED_WIDGET_WPM_LUNA=n
-CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA=n
-CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA=n
-```
-
-> These are estimates based on typical builds. Actual savings vary by compiler optimization and configuration.
-
 ---
 
-## Final Tips
+## Final tips
 
-1. **Start with the balanced preset** and adjust as needed
-2. **Monitor keyboard behavior** while typing quickly
-3. **If using RAW HID**, make sure you have enough memory
-4. **On split keyboards**, optimize the peripheral more aggressively
-5. **Always test** after changing memory configuration
+1. Start without any memory or stack option of your own.
+2. Type fast for a while with the animations on, and with every Bluetooth
+   host you use connected.
+3. On a split keyboard, save battery on the peripheral first.
+4. After any change in memory options, check the merged configuration.
